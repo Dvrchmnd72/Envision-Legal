@@ -1,0 +1,12 @@
+
+# WordPress - never commit content/secrets
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup*/
+wp-config.php
+
+# Server/editor junk
+*.log
+*.tmp
+.DS_Store
