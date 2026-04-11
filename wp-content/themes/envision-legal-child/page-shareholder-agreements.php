@@ -68,7 +68,7 @@ envision_legal_page_open( 'el-page--practice' );
 			</div>
 		<?php elseif ( 'invalid' === $el_enquiry ) : ?>
 			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
-				Please complete all required fields and try again.
+				Please complete all required fields and select the required options, then try again.
 			</div>
 		<?php elseif ( 'error' === $el_enquiry ) : ?>
 			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
@@ -101,8 +101,8 @@ envision_legal_page_open( 'el-page--practice' );
 				</select>
 			</div>
 			<div class="sha-form-group">
-				<label for="sha_incorporated">Is the company already incorporated?</label>
-				<select id="sha_incorporated" name="sha_incorporated">
+				<label for="sha_incorporated">Is the company already incorporated? *</label>
+				<select id="sha_incorporated" name="sha_incorporated" required>
 					<option value="">— Select —</option>
 					<option value="Yes">Yes</option>
 					<option value="No">No — we are setting up</option>

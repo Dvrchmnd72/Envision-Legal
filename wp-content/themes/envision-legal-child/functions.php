@@ -751,7 +751,7 @@ function el_handle_practice_intake_form() {
 			'slug'             => 'business-sales-acquisitions',
 			'anchor'           => 'bsa-enquiry-form',
 			'label'            => 'Business Sales & Acquisitions',
-			'required_selects' => array( 'bsa_role' ),
+			'required_selects' => array( 'bsa_role', 'bsa_value' ),
 			'text_fields'      => array(
 				'bsa_role'  => 'Role (Buying/Selling)',
 				'bsa_value' => 'Approximate deal value',
@@ -778,7 +778,7 @@ function el_handle_practice_intake_form() {
 			'slug'             => 'shareholder-agreements',
 			'anchor'           => 'sha-enquiry-form',
 			'label'            => 'Shareholder Agreements',
-			'required_selects' => array( 'sha_shareholders' ),
+			'required_selects' => array( 'sha_shareholders', 'sha_incorporated' ),
 			'text_fields'      => array(
 				'sha_shareholders' => 'Number of shareholders',
 				'sha_incorporated' => 'Company incorporated',
@@ -809,7 +809,7 @@ function el_handle_practice_intake_form() {
 			'slug'             => 'fractional-general-counsel',
 			'anchor'           => 'fgc-enquiry-form',
 			'label'            => 'Fractional General Counsel',
-			'required_selects' => array( 'fgc_size' ),
+			'required_selects' => array( 'fgc_size', 'fgc_spend' ),
 			'text_fields'      => array(
 				'fgc_company' => 'Company',
 				'fgc_size'    => 'Number of employees',
@@ -827,9 +827,20 @@ function el_handle_practice_intake_form() {
 		exit;
 	}
 
-	$cfg           = $pages[ $source ];
-	$redirect_base = home_url( '/' . $cfg['slug'] . '/' );
-	$anchor        = $cfg['anchor'];
+	$cfg    = $pages[ $source ];
+	$anchor = $cfg['anchor'];
+
+	/* Build a reliable redirect base URL. */
+	$referer = wp_get_referer();
+	if ( $referer ) {
+		/* Strip any existing query string / fragment from the referer. */
+		$parts         = parse_url( $referer );
+		$redirect_base = ( isset( $parts['scheme'] ) ? $parts['scheme'] . '://' : '' )
+			. ( isset( $parts['host'] ) ? $parts['host'] : '' )
+			. ( isset( $parts['path'] ) ? $parts['path'] : '/' );
+	} else {
+		$redirect_base = home_url( '/' . $cfg['slug'] . '/' );
+	}
 
 	/* ── Nonce ───────────────────────────────────────────────────────────── */
 	$nonce = isset( $_POST['el_practice_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['el_practice_nonce'] ) ) : '';
@@ -935,11 +946,7 @@ function el_handle_practice_intake_form() {
 	wp_mail( $email, $user_subject, $user_body, $user_headers );
 
 	/* ── Redirect ────────────────────────────────────────────────────────── */
-	if ( $sent ) {
-		wp_safe_redirect( add_query_arg( 'enquiry', 'ok', $redirect_base ) . '#' . $anchor );
-	} else {
-		wp_safe_redirect( add_query_arg( 'enquiry', 'error', $redirect_base ) . '#' . $anchor );
-	}
+	wp_safe_redirect( add_query_arg( 'enquiry', 'ok', $redirect_base ) . '#' . $anchor );
 	exit;
 }
 
