@@ -130,7 +130,7 @@ envision_legal_page_open( 'el-page--practice' );
 			</div>
 		<?php elseif ( 'invalid' === $el_enquiry ) : ?>
 			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
-				Please complete all required fields and try again.
+				Please complete all required fields and select the required options, then try again.
 			</div>
 		<?php elseif ( 'error' === $el_enquiry ) : ?>
 			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
@@ -168,8 +168,8 @@ envision_legal_page_open( 'el-page--practice' );
 				</select>
 			</div>
 			<div class="sha-form-group">
-				<label for="fgc_spend">Current monthly legal spend (approximate)</label>
-				<select id="fgc_spend" name="fgc_spend">
+				<label for="fgc_spend">Current monthly legal spend (approximate) *</label>
+				<select id="fgc_spend" name="fgc_spend" required>
 					<option value="">&#8212; Select &#8212;</option>
 					<option value="Under ,000">Under $1,000</option>
 					<option value=",000-,000">$1,000 &ndash; $3,000</option>

@@ -74,7 +74,7 @@ envision_legal_page_open( 'el-page--practice' );
 			</div>
 		<?php elseif ( 'invalid' === $el_enquiry ) : ?>
 			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
-				Please complete all required fields and try again.
+				Please complete all required fields and select the required options, then try again.
 			</div>
 		<?php elseif ( 'error' === $el_enquiry ) : ?>
 			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
@@ -108,8 +108,8 @@ envision_legal_page_open( 'el-page--practice' );
 				</select>
 			</div>
 			<div class="sha-form-group">
-				<label for="bsa_value">Approximate deal value</label>
-				<select id="bsa_value" name="bsa_value">
+				<label for="bsa_value">Approximate deal value *</label>
+				<select id="bsa_value" name="bsa_value" required>
 					<option value="">— Select —</option>
 					<option value="Under $250k">Under $250,000</option>
 					<option value="$250k–$1m">$250,000 – $1,000,000</option>
