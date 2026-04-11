@@ -59,37 +59,26 @@ envision_legal_page_open( 'el-page--practice' );
 			<p>Tell us about your situation and we will be in touch within one business day — no obligation.</p>
 		</header>
 		<?php
-		if ( isset( $_POST['sha_form_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['sha_form_nonce'] ) ), 'sha_intake_form' ) ) {
-			$name         = sanitize_text_field( wp_unslash( $_POST['sha_name'] ?? '' ) );
-			$email        = sanitize_email( wp_unslash( $_POST['sha_email'] ?? '' ) );
-			$phone        = sanitize_text_field( wp_unslash( $_POST['sha_phone'] ?? '' ) );
-			$shareholders = sanitize_text_field( wp_unslash( $_POST['sha_shareholders'] ?? '' ) );
-			$incorporated = sanitize_text_field( wp_unslash( $_POST['sha_incorporated'] ?? '' ) );
-			$concerns     = array_map( 'sanitize_text_field', wp_unslash( $_POST['sha_concerns'] ?? array() ) );
-			$notes        = sanitize_textarea_field( wp_unslash( $_POST['sha_notes'] ?? '' ) );
-			$to           = 'hello@envisionlegal.com.au';
-			$subject      = 'New Shareholder Agreement Enquiry — ' . $name;
-			$body         = "New shareholder agreement enquiry from the website:\n\n"
-				. "Name: $name\n"
-				. "Email: $email\n"
-				. "Phone: $phone\n"
-				. "Number of shareholders: $shareholders\n"
-				. "Company incorporated: $incorporated\n"
-				. "Main concerns: " . implode( ', ', $concerns ) . "\n"
-				. "Additional notes:\n$notes\n";
-			$headers = array( 'Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $name . ' <' . $email . '>' );
-			wp_mail( $to, $subject, $body, $headers );
-			?>
-			<div style="background:#f0faf4;border:2px solid #2e7d32;border-radius:8px;text-align:center;padding:2.5rem;">
+		$el_enquiry = isset( $_GET['enquiry'] ) ? sanitize_text_field( wp_unslash( $_GET['enquiry'] ) ) : '';
+		if ( 'ok' === $el_enquiry ) : ?>
+			<div style="background:#f0faf4;border:2px solid #2e7d32;border-radius:8px;text-align:center;padding:2.5rem;margin-bottom:1.5rem;">
 				<div style="font-size:2.5rem;margin-bottom:1rem;">&#10003;</div>
 				<h3 style="color:#2e7d32;margin:0 0 0.5rem;">Enquiry Received</h3>
-				<p style="margin:0;">Thanks <?php echo esc_html( $name ); ?> — we will be in touch within one business day.</p>
+				<p style="margin:0;">Thanks — we will be in touch within one business day.</p>
 			</div>
-			<?php
-		} else {
-		?>
-		<form method="post" action="#sha-enquiry-form" class="sha-intake-form" novalidate>
-			<?php wp_nonce_field( 'sha_intake_form', 'sha_form_nonce' ); ?>
+		<?php elseif ( 'invalid' === $el_enquiry ) : ?>
+			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
+				Please complete all required fields and try again.
+			</div>
+		<?php elseif ( 'error' === $el_enquiry ) : ?>
+			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
+				Something went wrong — please try again.
+			</div>
+		<?php endif; ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="sha-intake-form">
+			<input type="hidden" name="action" value="el_practice_intake">
+			<input type="hidden" name="el_source" value="sha">
+			<?php wp_nonce_field( 'el_practice_intake', 'el_practice_nonce' ); ?>
 			<div class="sha-form-group">
 				<label for="sha_name">Full Name *</label>
 				<input type="text" id="sha_name" name="sha_name" required placeholder="Jane Smith">
@@ -137,7 +126,6 @@ envision_legal_page_open( 'el-page--practice' );
 			</div>
 			<button type="submit" class="el-btn el-btn--navy" style="width:100%;margin-top:0.5rem;">Get a Free Call Back</button>
 		</form>
-		<?php } ?>
 	</div>
 </section>
 

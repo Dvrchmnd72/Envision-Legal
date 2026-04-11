@@ -64,27 +64,26 @@ envision_legal_page_open( 'el-page--practice' );
 			<p>Tell us about your contract situation and we will be in touch within one business day &mdash; no obligation.</p>
 		</header>
 		<?php
-		if ( isset( $_POST['uct_form_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['uct_form_nonce'] ) ), 'uct_intake_form' ) ) {
-			$name  = sanitize_text_field( wp_unslash( $_POST['uct_name'] ?? '' ) );
-			$email = sanitize_email( wp_unslash( $_POST['uct_email'] ?? '' ) );
-			$phone = sanitize_text_field( wp_unslash( $_POST['uct_phone'] ?? '' ) );
-			$need  = sanitize_text_field( wp_unslash( $_POST['uct_need'] ?? '' ) );
-			$notes = sanitize_textarea_field( wp_unslash( $_POST['uct_notes'] ?? '' ) );
-			$to      = 'hello@envisionlegal.com.au';
-			$subject = 'New Unfair Contract Terms Enquiry from ' . $name;
-			$body    = "New unfair contract terms enquiry:\n\nName: $name\nEmail: $email\nPhone: $phone\nNeed: $need\nNotes:\n$notes\n";
-			$headers = array( 'Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $name . ' <' . $email . '>' );
-			wp_mail( $to, $subject, $body, $headers );
-			?>
-			<div style="background:#f0faf4;border:2px solid #2e7d32;border-radius:8px;text-align:center;padding:2.5rem;">
+		$el_enquiry = isset( $_GET['enquiry'] ) ? sanitize_text_field( wp_unslash( $_GET['enquiry'] ) ) : '';
+		if ( 'ok' === $el_enquiry ) : ?>
+			<div style="background:#f0faf4;border:2px solid #2e7d32;border-radius:8px;text-align:center;padding:2.5rem;margin-bottom:1.5rem;">
 				<div style="font-size:2.5rem;margin-bottom:1rem;">&#10003;</div>
 				<h3 style="color:#2e7d32;margin:0 0 0.5rem;">Enquiry Received</h3>
-				<p style="margin:0;">Thanks <?php echo esc_html( $name ); ?> &mdash; we will be in touch within one business day.</p>
+				<p style="margin:0;">Thanks &mdash; we will be in touch within one business day.</p>
 			</div>
-			<?php
-		} else { ?>
-		<form method="post" action="#uct-enquiry-form" novalidate>
-			<?php wp_nonce_field( 'uct_intake_form', 'uct_form_nonce' ); ?>
+		<?php elseif ( 'invalid' === $el_enquiry ) : ?>
+			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
+				Please complete all required fields and try again.
+			</div>
+		<?php elseif ( 'error' === $el_enquiry ) : ?>
+			<div style="background:#fff5f5;border:2px solid #c0392b;border-radius:8px;text-align:center;padding:1rem;margin-bottom:1.5rem;" role="alert">
+				Something went wrong &mdash; please try again.
+			</div>
+		<?php endif; ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="el_practice_intake">
+			<input type="hidden" name="el_source" value="uct">
+			<?php wp_nonce_field( 'el_practice_intake', 'el_practice_nonce' ); ?>
 			<div class="sha-form-group">
 				<label for="uct_name">Full Name *</label>
 				<input type="text" id="uct_name" name="uct_name" required placeholder="Jane Smith">
@@ -114,7 +113,6 @@ envision_legal_page_open( 'el-page--practice' );
 			</div>
 			<button type="submit" class="el-btn el-btn--navy" style="width:100%;margin-top:0.5rem;">Get a Free Call Back</button>
 		</form>
-		<?php } ?>
 	</div>
 </section>
 
