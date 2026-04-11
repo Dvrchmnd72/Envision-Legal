@@ -653,12 +653,80 @@ add_action( 'manage_el_lead_posts_custom_column', function( $column, $post_id ) 
 }, 10, 2 );
 
 
-add_action( 'admin_post_nopriv_envision_contact', function() {
-	wp_safe_redirect( home_url( '/contact/?sent=ok' ) );
+/**
+ * Contact page: "Send Us a Message" fallback form handler.
+ */
+add_action( 'admin_post_nopriv_envision_contact', 'el_handle_contact_form' );
+add_action( 'admin_post_envision_contact', 'el_handle_contact_form' );
+
+function el_handle_contact_form() {
+	$redirect_base = home_url( '/contact/' );
+
+	// Nonce check.
+	if ( ! isset( $_POST['el_contact_nonce'] ) || ! wp_verify_nonce( $_POST['el_contact_nonce'], 'envision_contact' ) ) {
+		wp_safe_redirect( add_query_arg( 'sent', 'error', $redirect_base ) );
+		exit;
+	}
+
+	// Sanitize inputs.
+	$name    = isset( $_POST['el_name'] )    ? sanitize_text_field( wp_unslash( $_POST['el_name'] ) )       : '';
+	$email   = isset( $_POST['el_email'] )   ? sanitize_email( wp_unslash( $_POST['el_email'] ) )           : '';
+	$phone   = isset( $_POST['el_phone'] )   ? sanitize_text_field( wp_unslash( $_POST['el_phone'] ) )      : '';
+	$message = isset( $_POST['el_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['el_message'] ) ) : '';
+
+	// Validate required fields.
+	if ( empty( $name ) || empty( $message ) || ! is_email( $email ) ) {
+		wp_safe_redirect( add_query_arg( 'sent', 'invalid', $redirect_base ) );
+		exit;
+	}
+
+	// Store lead.
+	el_store_lead(
+		'contact-send-us-a-message',
+		$name,
+		$email,
+		array(
+			'phone'   => $phone,
+			'message' => $message,
+			'page'    => home_url( '/contact/' ),
+		)
+	);
+
+	// Admin email.
+	$admin_to      = get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' );
+	$admin_subject = 'New Contact Message from ' . $name . ' — Envision Legal';
+	$admin_body    = "New contact form submission (Send Us a Message).\n\n"
+		. 'Name: '    . $name    . "\n"
+		. 'Email: '   . $email   . "\n"
+		. 'Phone: '   . ( $phone ? $phone : '(not provided)' ) . "\n"
+		. 'Message: '  . "\n" . $message . "\n\n"
+		. 'Page: '    . home_url( '/contact/' ) . "\n"
+		. 'Time (UTC): ' . gmdate( 'Y-m-d H:i:s' ) . "\n";
+
+	$admin_headers = array(
+		'Content-Type: text/plain; charset=UTF-8',
+		'Reply-To: ' . $name . ' <' . $email . '>',
+	);
+
+	$sent = wp_mail( $admin_to, $admin_subject, $admin_body, $admin_headers );
+
+	// Brief confirmation email to the user.
+	$user_subject = 'We received your message — Envision Legal';
+	$user_body    = 'Hi ' . $name . ",\n\n"
+		. "Thanks for getting in touch. We've received your message and will respond within one business day.\n\n"
+		. "If your matter is urgent, feel free to call us directly.\n\n"
+		. "Regards,\nEnvision Legal\n";
+
+	$user_headers = array( 'Reply-To: Envision Legal <' . $admin_to . '>' );
+
+	wp_mail( $email, $user_subject, $user_body, $user_headers );
+
+	// Redirect based on admin email result.
+	if ( $sent ) {
+		wp_safe_redirect( add_query_arg( 'sent', 'ok', $redirect_base ) );
+	} else {
+		wp_safe_redirect( add_query_arg( 'sent', 'error', $redirect_base ) );
+	}
 	exit;
-} );
-add_action( 'admin_post_envision_contact', function() {
-	wp_safe_redirect( home_url( '/contact/?sent=ok' ) );
-	exit;
-} );
+}
 
