@@ -902,8 +902,11 @@ function el_handle_practice_intake_form() {
 	);
 
 	/* ── Admin email ─────────────────────────────────────────────────────── */
-	$admin_to      = get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' );
-	$safe_name     = str_replace( array( "\r", "\n" ), '', $name );
+	$admin_to      = sanitize_email( get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' ) );
+	if ( ! is_email( $admin_to ) ) {
+		$admin_to = 'hello@envisionlegal.com.au';
+	}
+	$safe_name     = sanitize_text_field( str_replace( array( "\r", "\n" ), '', $name ) );
 	$admin_subject = 'New ' . $cfg['label'] . ' Enquiry from ' . $safe_name . ' — Envision Legal';
 	$admin_body    = 'New ' . $cfg['label'] . " callback enquiry from the website.\n\n"
 		. 'Name: '  . $name  . "\n"
