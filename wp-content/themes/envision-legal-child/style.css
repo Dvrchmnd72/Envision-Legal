@@ -1,0 +1,283 @@
+/*
+Theme Name:  Envision Legal
+Description: Astra child theme for Envision Legal – a boutique commercial law firm.
+Author:      Dvrchmnd72
+Author URI:  https://github.com/Dvrchmnd72
+Template:    astra
+Version:     1.0.0
+License:     GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: envision-legal
+Tags:        law, legal, astra, child-theme
+*/
+
+/* =========================================================
+   Envision Legal – base overrides loaded after Astra styles
+   Full custom CSS lives in assets/css/theme.css
+   ========================================================= */
+
+/* Ensure WP Custom Logo displays in header */
+.el-header__logo .custom-logo-link { display: inline-flex; align-items: center; }
+.el-header__logo img.custom-logo {
+  display: block;
+  max-height: 56px;   /* adjust as needed */
+  width: auto;
+  height: auto;
+}
+
+/* Header layout fix */
+.el-header { background: #fff; }
+.el-header__inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  padding:16px 0;
+}
+
+/* Logo sizing (vertical logo -> keep height capped) */
+.el-header__logo{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+}
+.el-header__logo .custom-logo-link { display:flex; align-items:center; }
+.el-header__logo img.custom-logo{
+  max-height:64px;     /* try 56–72 depending on preference */
+  width:auto;
+  height:auto;
+}
+
+/* Nav stays on one line (desktop) */
+.el-nav{ flex:1 1 auto; }
+.el-nav__list{
+  display:flex;
+  gap:22px;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:nowrap;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+/* CTA button doesn't wrap weirdly */
+.el-header__cta{ white-space:nowrap; }
+
+/* Hide mobile toggle on desktop (adjust breakpoint if needed) */
+@media (min-width: 900px){
+  .el-nav-toggle{ display:none; }
+}
+
+/* =========================================================
+   Envision: OSL Booking widget styling (match Astra variables)
+   ========================================================= */
+
+/* Wrapper variables (use Astra globals so it inherits Envision palette) */
+.osl-bk-wrapper{
+  --el-accent: var(--ast-global-color-0, #111827);
+  --el-accent-2: var(--ast-global-color-1, #2563eb);
+  --el-text: var(--ast-global-color-2, #111827);
+  --el-muted: var(--ast-global-color-3, #6b7280);
+  --el-border: rgba(17, 24, 39, 0.12);
+  --el-surface: #ffffff;
+  --el-surface-2: rgba(17, 24, 39, 0.035);
+  --el-radius: 14px;
+}
+
+/* Container: cleaner card */
+.osl-bk-container{
+  max-width: 980px;
+  margin: 1.25rem auto 2.25rem;
+  padding: 2rem;
+  background: var(--el-surface);
+  border: 1px solid var(--el-border);
+  border-radius: var(--el-radius);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.07);
+}
+
+/* Header: keep simple and brand-consistent */
+.osl-bk-header{ margin-bottom: 1.25rem; }
+.osl-bk-header-icon{ display:none; }
+.osl-bk-header h3{
+  margin: 0;
+  color: var(--el-text);
+  letter-spacing: -0.02em;
+}
+.osl-bk-header span{
+  color: var(--el-muted);
+}
+
+/* Section headings */
+.osl-bk-step-label{
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--el-text);
+  margin: 0 0 .85rem;
+}
+
+/* Grid spacing */
+.osl-bk-service-grid,
+.osl-bk-duration-grid{
+  gap: 14px;
+}
+
+/* Cards */
+.osl-bk-service-card,
+.osl-bk-duration-card{
+  background: var(--el-surface);
+  border: 1px solid var(--el-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.02);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .05s ease, background .15s ease;
+}
+
+.osl-bk-service-card:hover,
+.osl-bk-duration-card:hover{
+  border-color: rgba(17, 24, 39, 0.20);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+}
+
+/* Selected state: use Astra accent color (not gold) */
+.osl-bk-service-selected,
+.osl-bk-duration-selected{
+  border-color: var(--el-accent-2) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--el-accent-2), #ffffff 75%);
+}
+
+/* Typography */
+.osl-bk-service-inner strong{
+  font-size: 0.98rem;
+  color: var(--el-text);
+}
+.osl-bk-duration-inner strong{ color: var(--el-text); }
+.osl-bk-duration-inner small{ color: var(--el-muted); }
+
+/* Price row */
+.osl-bk-duration-price{
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--el-text);
+}
+.osl-bk-duration-price small{
+  font-weight: 600;
+  color: var(--el-muted);
+}
+
+/* FREE: subtle professional highlight */
+.osl-bk-free{ color: #047857; }
+
+/* Payment notice */
+.osl-bk-payment-notice{
+  border: 1px solid var(--el-border);
+  background: var(--el-surface-2);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.osl-bk-notice-text strong{ color: var(--el-text); }
+.osl-bk-notice-text p{ color: var(--el-muted); }
+
+/* Buttons */
+.osl-bk-next,
+button.osl-bk-next{
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+/* Mobile */
+@media (max-width: 600px){
+  .osl-bk-container{ padding: 1.25rem; }
+}
+
+
+/* Envision: book page note */
+.el-booking-note{
+  max-width: 980px;
+  margin: 0 auto 1rem;
+  padding: 14px 16px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.035);
+}
+.el-booking-note p{
+  margin: .25rem 0;
+  color: var(--ast-global-color-2, #111827);
+}
+.el-booking-note strong{
+  color: var(--ast-global-color-2, #111827);
+}
+
+
+/* Envision: booking note inside widget */
+.osl-bk-container .el-booking-note--inside{
+  margin: 0 0 1.25rem;
+  padding: 14px 16px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.035);
+}
+.osl-bk-container .el-booking-note--inside p{
+  margin: .25rem 0;
+  color: var(--ast-global-color-2, #111827);
+}
+.osl-bk-container .el-booking-note--inside strong{
+  color: var(--ast-global-color-2, #111827);
+}
+
+
+/* ── Shareholder Agreement Intake Form ──────────────────────────────────── */
+.sha-intake-form { display:flex; flex-direction:column; gap:1.25rem; }
+.sha-form-group { display:flex; flex-direction:column; gap:0.35rem; }
+.sha-form-group label { font-weight:600; font-size:0.95rem; color:var(--el-navy); }
+.sha-form-group input,
+.sha-form-group select,
+.sha-form-group textarea {
+	width:100%; padding:0.75rem 1rem;
+	border:1.5px solid #d1d5db; border-radius:6px;
+	font-size:1rem; font-family:inherit;
+	background:#fff; color:var(--el-navy);
+	transition:border-color 0.2s;
+	box-sizing:border-box;
+}
+.sha-form-group input:focus,
+.sha-form-group select:focus,
+.sha-form-group textarea:focus {
+	outline:none; border-color:var(--el-navy);
+	box-shadow:0 0 0 3px rgba(15,23,42,0.08);
+}
+.sha-form-group fieldset { border:none; padding:0; margin:0; }
+.sha-form-group legend { font-weight:600; font-size:0.95rem; color:var(--el-navy); margin-bottom:0.6rem; }
+.sha-checkbox { display:flex; align-items:center; gap:0.6rem; font-weight:400; padding:0.3rem 0; cursor:pointer; }
+.sha-checkbox input[type="checkbox"] { width:auto; margin:0; accent-color:var(--el-navy); }
+
+/* ── Fix accordion trigger text colour on hover/expanded ─────────────────── */
+.el-accordion__trigger:hover,
+.el-accordion__trigger[aria-expanded="true"] {
+	color: var(--el-navy);
+}
+
+/* ── Fix accordion trigger text turning white on hover ───────────────────── */
+.el-accordion__trigger:hover,
+.el-accordion__trigger:focus,
+.el-accordion__trigger[aria-expanded="true"] {
+	color: var(--el-navy) !important;
+	background: var(--el-cream) !important;
+}
+
+/* ── Force accordion trigger text dark on all states ─────────────────────── */
+button.el-accordion__trigger,
+button.el-accordion__trigger:hover,
+button.el-accordion__trigger:focus,
+button.el-accordion__trigger:active,
+button.el-accordion__trigger[aria-expanded="true"],
+button.el-accordion__trigger[aria-expanded="false"] {
+	color: var(--el-navy) !important;
+}
+button.el-accordion__trigger,
+button.el-accordion__trigger:hover,
+button.el-accordion__trigger:focus,
+button.el-accordion__trigger:active,
+button.el-accordion__trigger[aria-expanded="true"],
+button.el-accordion__trigger[aria-expanded="false"] {
+	color: var(--el-navy) !important;
+}

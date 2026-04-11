@@ -1,0 +1,664 @@
+<?php
+/**
+ * Envision Legal – Child Theme Functions
+ *
+ * @package EnvisionLegal
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+// ── Constants ────────────────────────────────────────────────────────────────
+define( 'ENVISION_LEGAL_VERSION', '1.1.18' );
+define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
+define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
+
+// ── Enqueue parent + child styles and scripts ─────────────────────────────────
+add_action( 'wp_enqueue_scripts', 'envision_legal_enqueue_assets' );
+function envision_legal_enqueue_assets() {
+	// 1. Astra parent stylesheet
+	wp_enqueue_style(
+		'astra-parent-style',
+		get_template_directory_uri() . '/style.css',
+		array(),
+		ENVISION_LEGAL_VERSION
+	);
+
+	// 2. Child theme style overrides
+	wp_enqueue_style(
+		'envision-legal-style',
+		ENVISION_LEGAL_URI . '/style.css',
+		array( 'astra-parent-style' ),
+		ENVISION_LEGAL_VERSION
+	);
+
+	// 3. Main theme CSS
+	wp_enqueue_style(
+		'envision-legal-theme',
+		ENVISION_LEGAL_URI . '/assets/css/theme.css',
+		array( 'envision-legal-style', 'astra-theme-css' ),
+		ENVISION_LEGAL_VERSION
+	);
+
+	// 4. Google Fonts – Inter + Playfair Display
+	wp_enqueue_style(
+		'envision-legal-google-fonts',
+		'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap',
+		array(),
+		null
+	);
+
+	// 5. Theme JavaScript
+	wp_enqueue_script(
+		'envision-legal-theme',
+		ENVISION_LEGAL_URI . '/assets/js/theme.js',
+		array( 'jquery' ),
+		ENVISION_LEGAL_VERSION,
+		true
+	);
+
+	// Pass AJAX URL to JS
+	wp_localize_script(
+		'envision-legal-theme',
+		'envisionLegal',
+		array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'envision_legal_nonce' ),
+		)
+	);
+}
+
+// ── Theme Support ─────────────────────────────────────────────────────────────
+add_action( 'after_setup_theme', 'envision_legal_setup' );
+function envision_legal_setup() {
+	// Featured Images
+	add_theme_support( 'post-thumbnails' );
+
+	// Title tag
+	add_theme_support( 'title-tag' );
+
+	// HTML5
+	add_theme_support(
+		'html5',
+		array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'script', 'style' )
+	);
+
+	// Custom logo
+	add_theme_support(
+		'custom-logo',
+		array(
+			'height'      => 80,
+			'width'       => 240,
+			'flex-height' => true,
+			'flex-width'  => true,
+		)
+	);
+
+	// Feed links
+	add_theme_support( 'automatic-feed-links' );
+
+	// Wide/full-width block alignment
+	add_theme_support( 'align-wide' );
+
+	// Register image sizes
+	add_image_size( 'envision-featured',  1200, 600, true );
+	add_image_size( 'envision-card',       600, 400, true );
+	add_image_size( 'envision-thumbnail',  400, 266, true );
+}
+
+// ── Navigation Menus ──────────────────────────────────────────────────────────
+add_action( 'after_setup_theme', 'envision_legal_register_menus' );
+function envision_legal_register_menus() {
+	register_nav_menus(
+		array(
+			'primary'  => esc_html__( 'Primary Navigation', 'envision-legal' ),
+			'footer'   => esc_html__( 'Footer Navigation', 'envision-legal' ),
+		)
+	);
+}
+
+// ── Widget Areas ──────────────────────────────────────────────────────────────
+add_action( 'widgets_init', 'envision_legal_register_sidebars' );
+function envision_legal_register_sidebars() {
+	$shared = array(
+		'before_widget' => '<div id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</div>',
+		'before_title'  => '<h3 class="widget-title">',
+		'after_title'   => '</h3>',
+	);
+
+	register_sidebar(
+		array_merge(
+			$shared,
+			array(
+				'name'        => esc_html__( 'Blog Sidebar', 'envision-legal' ),
+				'id'          => 'sidebar-blog',
+				'description' => esc_html__( 'Widgets for the blog sidebar.', 'envision-legal' ),
+			)
+		)
+	);
+
+	register_sidebar(
+		array_merge(
+			$shared,
+			array(
+				'name'        => esc_html__( 'Footer Widget Area', 'envision-legal' ),
+				'id'          => 'footer-widgets',
+				'description' => esc_html__( 'Widgets for the site footer.', 'envision-legal' ),
+			)
+		)
+	);
+}
+
+// ── Customizer additions ───────────────────────────────────────────────────────
+add_action( 'customize_register', 'envision_legal_customizer' );
+function envision_legal_customizer( $wp_customize ) {
+	// ── Firm Details section ──
+	$wp_customize->add_section(
+		'envision_legal_firm',
+		array(
+			'title'    => esc_html__( 'Firm Details', 'envision-legal' ),
+			'priority' => 30,
+		)
+	);
+
+	$firm_settings = array(
+		'phone'   => array( 'label' => 'Phone Number',  'default' => '+61 2 8000 0000' ),
+		'email'   => array( 'label' => 'Email Address', 'default' => 'hello@envisionlegal.com.au' ),
+		'address' => array( 'label' => 'Office Address', 'default' => 'Sydney, NSW, Australia' ),
+	);
+
+	foreach ( $firm_settings as $key => $args ) {
+		$wp_customize->add_setting(
+			'envision_legal_' . $key,
+			array(
+				'default'           => $args['default'],
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			'envision_legal_' . $key,
+			array(
+				'label'   => esc_html__( $args['label'], 'envision-legal' ),
+				'section' => 'envision_legal_firm',
+				'type'    => 'text',
+			)
+		);
+	}
+}
+
+// ── Helper: get firm contact details ──────────────────────────────────────────
+function envision_legal_get_phone() {
+	return esc_html( get_theme_mod( 'envision_legal_phone', '+61 2 8000 0000' ) );
+}
+function envision_legal_get_email() {
+	return esc_html( get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' ) );
+}
+function envision_legal_get_address() {
+	return esc_html( get_theme_mod( 'envision_legal_address', 'Sydney, NSW, Australia' ) );
+}
+
+// ── Helper: render site header ─────────────────────────────────────────────────
+function envision_legal_header() {
+	?>
+	<header class="el-header" role="banner">
+		<div class="el-container el-header__inner">
+			<div class="el-header__logo">
+				<?php if ( has_custom_logo() ) : ?>
+					<?php the_custom_logo(); ?>
+				<?php else : ?>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" class="el-header__site-name">
+						<?php bloginfo( 'name' ); ?>
+					</a>
+				<?php endif; ?>
+			</div>
+
+			<button class="el-nav-toggle" aria-controls="el-primary-nav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'envision-legal' ); ?>">
+				<span></span><span></span><span></span>
+			</button>
+
+			<nav id="el-primary-nav" class="el-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary', 'envision-legal' ); ?>">
+				<?php
+				wp_nav_menu(
+					array(
+						'theme_location' => 'primary',
+						'menu_class'     => 'el-nav__list',
+						'container'      => false,
+						'fallback_cb'    => 'envision_legal_fallback_menu',
+					)
+				);
+				?>
+			</nav>
+
+			<a href="<?php echo esc_url( get_permalink( get_page_by_path( 'contact' ) ) ); ?>" class="el-btn el-header__cta">
+				<?php esc_html_e( 'Get in Touch', 'envision-legal' ); ?>
+			</a>
+		</div>
+	</header>
+	<?php
+}
+
+// Fallback menu when no menu is assigned
+function envision_legal_fallback_menu() {
+	echo '<ul class="el-nav__list">';
+	echo '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'envision-legal' ) . '</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/about' ) ) . '">' . esc_html__( 'About', 'envision-legal' ) . '</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/practiceareas' ) ) . '">' . esc_html__( 'Practice Areas', 'envision-legal' ) . '</a></li>';
+	echo '<li><a href="' . esc_url( get_permalink( get_option( 'page_for_posts' ) ) ) . '">' . esc_html__( 'Blog', 'envision-legal' ) . '</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/contact' ) ) . '">' . esc_html__( 'Contact', 'envision-legal' ) . '</a></li>';
+	echo '</ul>';
+}
+
+// ── Helper: render site footer ─────────────────────────────────────────────────
+function envision_legal_footer() {
+	$year = gmdate( 'Y' );
+	?>
+	<footer class="el-footer" role="contentinfo">
+		<div class="el-container el-footer__inner">
+			<div class="el-footer__brand">
+				<span class="el-footer__site-name"><?php bloginfo( 'name' ); ?></span>
+				<p class="el-footer__tagline"><?php bloginfo( 'description' ); ?></p>
+			</div>
+
+			<div class="el-footer__nav">
+				<?php
+				wp_nav_menu(
+					array(
+						'theme_location' => 'footer',
+						'menu_class'     => 'el-footer__list',
+						'container'      => false,
+						'depth'          => 1,
+						'fallback_cb'    => false,
+					)
+				);
+				?>
+			</div>
+
+			<div class="el-footer__contact">
+				<p>
+					<a href="tel:<?php echo esc_attr( preg_replace( '/\s/', '', get_theme_mod( 'envision_legal_phone', '+61280000000' ) ) ); ?>">
+						<?php echo envision_legal_get_phone(); ?>
+					</a>
+				</p>
+				<p>
+					<a href="mailto:<?php echo esc_attr( get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' ) ); ?>">
+						<?php echo envision_legal_get_email(); ?>
+					</a>
+				</p>
+				<p><?php echo envision_legal_get_address(); ?></p>
+			</div>
+		</div>
+
+		<div class="el-footer__legal">
+			<div class="el-container">
+				<p>
+					<?php
+					printf(
+						/* translators: %1$s = year, %2$s = site name */
+						esc_html__( '&copy; %1$s %2$s. All rights reserved.', 'envision-legal' ),
+						esc_html( $year ),
+						esc_html( get_bloginfo( 'name' ) )
+					);
+					?>
+					&nbsp;&mdash;&nbsp;
+					<a href="<?php echo esc_url( home_url( '/privacypolicy' ) ); ?>"><?php esc_html_e( 'Privacy Policy', 'envision-legal' ); ?></a>
+					&nbsp;&middot;&nbsp;
+					<a href="<?php echo esc_url( home_url( '/termsofuse' ) ); ?>"><?php esc_html_e( 'Terms of Use', 'envision-legal' ); ?></a>
+				</p>
+			</div>
+		</div>
+	</footer>
+	<?php
+}
+
+// ── Helper: page wrapper open ──────────────────────────────────────────────────
+function envision_legal_page_open( $class = '' ) {
+	$classes = 'el-page' . ( $class ? ' ' . $class : '' );
+	echo '<main id="main-content" class="' . esc_attr( $classes ) . '" role="main">';
+}
+
+function envision_legal_page_close() {
+	echo '</main>';
+}
+
+// ── Excerpt length ─────────────────────────────────────────────────────────────
+add_filter( 'excerpt_length', function() { return 30; } );
+add_filter( 'excerpt_more',   function() { return '&hellip;'; } );
+
+// ── Remove Astra sections that conflict ───────────────────────────────────────
+add_action( 'wp_head', 'envision_legal_custom_head', 20 );
+function envision_legal_custom_head() {
+	// nothing here by default – hook available for child theme overrides
+}
+
+/**
+ * Force-disable GoDaddy Launch "Coming Soon" page so the site renders normally.
+ */
+
+/**
+ * Disable Astra header/footer output (we render our own in header.php/footer.php).
+ */
+add_action( 'wp', function () {
+
+	// Header.
+	remove_action( 'astra_header', 'astra_header_markup_open', 5 );
+	remove_action( 'astra_header', 'astra_header_markup_close', 15 );
+	remove_action( 'astra_header', 'astra_header_content', 10 );
+
+	// Footer.
+	remove_action( 'astra_footer', 'astra_footer_markup_open', 5 );
+	remove_action( 'astra_footer', 'astra_footer_markup_close', 15 );
+	remove_action( 'astra_footer', 'astra_footer_content', 10 );
+
+}, 20 );
+
+/**
+ * Disable Astra header/footer output (we render our own in header.php/footer.php).
+ */
+add_action( 'wp', function () {
+
+	// Header.
+	remove_action( 'astra_header', 'astra_header_markup_open', 5 );
+	remove_action( 'astra_header', 'astra_header_markup_close', 15 );
+	remove_action( 'astra_header', 'astra_header_content', 10 );
+
+	// Footer.
+	remove_action( 'astra_footer', 'astra_footer_markup_open', 5 );
+	remove_action( 'astra_footer', 'astra_footer_markup_close', 15 );
+	remove_action( 'astra_footer', 'astra_footer_content', 10 );
+
+}, 20 );
+
+/**
+ * Redirect legacy /blog to the current Posts page (Insights).
+ */
+add_action( 'template_redirect', function () {
+	$request_uri = $_SERVER['REQUEST_URI'] ?? '';
+	if ( untrailingslashit( $request_uri ) === '/blog' ) {
+		$posts_page_id = (int) get_option( 'page_for_posts' );
+		if ( $posts_page_id ) {
+			wp_safe_redirect( get_permalink( $posts_page_id ), 301 );
+			exit;
+		}
+	}
+} );
+
+
+/**
+ * Global "Book Consultation" CTA on pages (except Home, Contact, and Book page).
+ * Injected into the main page content so it works even if Astra hooks aren't used.
+ */
+add_filter( 'the_content', function ( $content ) {
+
+	// Only inject into main page content.
+	if ( ! is_page() || ! in_the_loop() || ! is_main_query() ) {
+		return $content;
+	}
+
+	// Exclusions: Home (7), Contact (9), Book (46).
+	if ( is_page( array( 7, 9, 46 ) ) ) {
+		return $content;
+	}
+
+	$book_url = esc_url( home_url( '/book/' ) );
+
+	$cta  = '<div class="el-page-cta" style="margin: 1.25rem 0 2rem;">';
+	$cta .= '<a class="el-btn el-btn--primary" href="' . $book_url . '">Book Consultation</a>';
+	$cta .= '</div>';
+
+	return $cta . $content;
+
+}, 12 );
+
+
+/**
+ * Referral Partner Portal — CPT + form handler.
+ */
+require_once get_stylesheet_directory() . '/referral-handler.php';
+
+// ── Remove Astra featured image from blog cards ───────────────────────────────
+add_action( 'wp', function() {
+	if ( is_archive() || is_home() || is_search() ) {
+		remove_action( 'astra_entry_top', 'astra_entry_thumbnail_before' );
+		remove_action( 'astra_entry_top', 'astra_entry_thumbnail_after' );
+		add_filter( 'astra_blog_post_featured_image_enabled', '__return_false' );
+		add_filter( 'astra_blog_post_thumbnail', '__return_false' );
+	}
+});
+
+/**
+ * Lead magnet: Fractional Counsel PDF download (single opt-in).
+ */
+add_action( 'admin_post_nopriv_el_fc_download', 'el_handle_fc_download' );
+add_action( 'admin_post_el_fc_download', 'el_handle_fc_download' );
+
+function el_handle_fc_download() {
+	$pdf_url = 'https://envisionlegal.com.au/wp-content/uploads/2026/04/Fractional-Counsel_Envision-Legal-1.pdf';
+
+	// Nonce + honeypot checks.
+	if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'el_fc_download' ) ) {
+		wp_safe_redirect( home_url( '/fractional-general-counsel/?download=error' ) );
+		exit;
+	}
+	if ( ! empty( $_POST['el_company'] ) ) { // honeypot (should be empty)
+		wp_safe_redirect( home_url( '/fractional-general-counsel/?download=ok' ) );
+		exit;
+	}
+
+	$name  = isset( $_POST['el_name'] ) ? sanitize_text_field( wp_unslash( $_POST['el_name'] ) ) : '';
+	$email = isset( $_POST['el_email'] ) ? sanitize_email( wp_unslash( $_POST['el_email'] ) ) : '';
+
+	if ( empty( $email ) || ! is_email( $email ) ) {
+		wp_safe_redirect( home_url( '/fractional-general-counsel/?download=invalid' ) );
+		exit;
+	}
+
+	// 1) Alert email to hello@
+	$admin_to      = 'hello@envisionlegal.com.au';
+	$admin_subject = 'Info Pack Download Request — Fractional General Counsel';
+	$admin_body    = "Someone requested the Fractional Counsel info pack.\n\n"
+		. 'Name: ' . ( $name ? $name : '(not provided)' ) . "\n"
+		. 'Email: ' . $email . "\n"
+		. 'Page: ' . home_url( '/fractional-general-counsel/' ) . "\n"
+		. 'Time (UTC): ' . gmdate( 'Y-m-d H:i:s' ) . "\n";
+
+	wp_mail( $admin_to, $admin_subject, $admin_body );
+
+	// 2) Email the user the link
+	$user_subject = 'Your Fractional Counsel Info Pack (PDF) — Envision Legal';
+	$user_body    = 'Hi' . ( $name ? " {$name}" : '' ) . ",\n\n"
+		. "Thanks for your interest in our Fractional General Counsel service.\n\n"
+		. "Download the info pack here:\n{$pdf_url}\n\n"
+		. "If you’d like to discuss next steps, reply to this email or contact us here:\n"
+		. home_url( '/contact/' ) . "\n\n"
+		. "Regards,\nEnvision Legal\n";
+
+	$headers = array( 'Reply-To: Envision Legal <hello@envisionlegal.com.au>' );
+
+	wp_mail( $email, $user_subject, $user_body, $headers );
+
+	wp_safe_redirect( home_url( '/fractional-general-counsel/?download=ok' ) );
+	exit;
+}
+
+
+/**
+ * Leads (admin-only): store submissions & download requests.
+ */
+add_action( 'init', function() {
+	if ( post_type_exists( 'el_lead' ) ) {
+		return;
+	}
+
+	register_post_type(
+		'el_lead',
+		array(
+			'labels' => array(
+				'name'          => 'Leads',
+				'singular_name' => 'Lead',
+			),
+			'public'          => false,
+			'show_ui'         => true,
+			'show_in_menu'    => true,
+			'menu_icon'       => 'dashicons-groups',
+			'supports'        => array( 'title' ),
+			'capability_type' => 'post',
+		)
+	);
+} );
+
+/**
+ * Store a lead in WP Admin (CPT: el_lead).
+ *
+ * @return int|WP_Error Lead post ID or error.
+ */
+function el_store_lead( $source, $name, $email, $meta = array() ) {
+	$source = sanitize_key( (string) $source );
+	$name   = sanitize_text_field( (string) $name );
+	$email  = sanitize_email( (string) $email );
+
+	$lead_id = wp_insert_post(
+		array(
+			'post_type'   => 'el_lead',
+			'post_status' => 'publish',
+			'post_title'  => ucfirst( str_replace( '-', ' ', $source ) ) . ' — ' . $email,
+		)
+	);
+
+	if ( ! $lead_id || is_wp_error( $lead_id ) ) {
+		return $lead_id;
+	}
+
+	update_post_meta( $lead_id, 'lead_source', $source );
+	update_post_meta( $lead_id, 'name', $name );
+	update_post_meta( $lead_id, 'email', $email );
+	update_post_meta( $lead_id, 'created_utc', gmdate( 'Y-m-d H:i:s' ) );
+	update_post_meta( $lead_id, 'ip', $_SERVER['REMOTE_ADDR'] ?? '' );
+	update_post_meta( $lead_id, 'user_agent', $_SERVER['HTTP_USER_AGENT'] ?? '' );
+
+	if ( is_array( $meta ) ) {
+		foreach ( $meta as $k => $v ) {
+			update_post_meta( $lead_id, sanitize_key( (string) $k ), is_scalar( $v ) ? (string) $v : wp_json_encode( $v ) );
+		}
+	}
+
+	return $lead_id;
+}
+
+/**
+ * Lead magnet: Fractional Counsel PDF download (single opt-in) — v2.
+ * Stores lead in WP Admin + emails user + alerts hello@.
+ */
+add_action( 'admin_post_nopriv_el_fc_download_v2', 'el_handle_fc_download_v2' );
+add_action( 'admin_post_el_fc_download_v2', 'el_handle_fc_download_v2' );
+
+function el_handle_fc_download_v2() {
+	$pdf_url = 'https://envisionlegal.com.au/wp-content/uploads/2026/04/Fractional-Counsel_Envision-Legal-1.pdf';
+
+	// Nonce + honeypot checks.
+	if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'el_fc_download' ) ) {
+		wp_safe_redirect( home_url( '/fractional-general-counsel/?download=error' ) );
+		exit;
+	}
+	if ( ! empty( $_POST['el_company'] ) ) { // honeypot (should be empty)
+		wp_safe_redirect( home_url( '/fractional-general-counsel/?download=ok' ) );
+		exit;
+	}
+
+	$name  = isset( $_POST['el_name'] ) ? sanitize_text_field( wp_unslash( $_POST['el_name'] ) ) : '';
+	$email = isset( $_POST['el_email'] ) ? sanitize_email( wp_unslash( $_POST['el_email'] ) ) : '';
+
+	if ( empty( $email ) || ! is_email( $email ) ) {
+		wp_safe_redirect( home_url( '/fractional-general-counsel/?download=invalid' ) );
+		exit;
+	}
+
+	// Store lead in WP.
+	el_store_lead(
+		'fractional-counsel-info-pack',
+		$name,
+		$email,
+		array(
+			'pdf_url' => $pdf_url,
+			'page'    => home_url( '/fractional-general-counsel/' ),
+		)
+	);
+
+	// 1) Alert email to hello@
+	$admin_to      = 'hello@envisionlegal.com.au';
+	$admin_subject = 'Info Pack Download Request — Fractional General Counsel';
+	$admin_body    = "Someone requested the Fractional Counsel info pack.\n\n"
+		. 'Name: ' . ( $name ? $name : '(not provided)' ) . "\n"
+		. 'Email: ' . $email . "\n"
+		. 'Page: ' . home_url( '/fractional-general-counsel/' ) . "\n"
+		. 'Time (UTC): ' . gmdate( 'Y-m-d H:i:s' ) . "\n";
+
+	wp_mail( $admin_to, $admin_subject, $admin_body );
+
+	// 2) Email the user the link
+	$user_subject = 'Your Fractional Counsel Info Pack (PDF) — Envision Legal';
+	$user_body    = 'Hi' . ( $name ? " {$name}" : '' ) . ",\n\n"
+		. "Thanks for your interest in our Fractional General Counsel service.\n\n"
+		. "Download the info pack here:\n{$pdf_url}\n\n"
+		. "If you’d like to discuss next steps, reply to this email or contact us here:\n"
+		. home_url( '/contact/' ) . "\n\n"
+		. "Regards,\nEnvision Legal\n";
+
+	$headers = array( 'Reply-To: Envision Legal <hello@envisionlegal.com.au>' );
+
+	wp_mail( $email, $user_subject, $user_body, $headers );
+
+	wp_safe_redirect( home_url( '/fractional-general-counsel/?download=ok' ) );
+	exit;
+}
+
+
+/**
+ * Admin columns for Leads CPT.
+ */
+add_filter( 'manage_el_lead_posts_columns', function( $columns ) {
+	$new = array();
+
+	// Keep checkbox first.
+	if ( isset( $columns['cb'] ) ) {
+		$new['cb'] = $columns['cb'];
+	}
+
+	$new['title']       = 'Lead';
+	$new['lead_name']   = 'Name';
+	$new['lead_email']  = 'Email';
+	$new['lead_source'] = 'Source';
+	$new['date']        = $columns['date'] ?? 'Date';
+
+	return $new;
+} );
+
+add_action( 'manage_el_lead_posts_custom_column', function( $column, $post_id ) {
+	if ( 'lead_name' === $column ) {
+		echo esc_html( get_post_meta( $post_id, 'name', true ) );
+		return;
+	}
+	if ( 'lead_email' === $column ) {
+		$email = get_post_meta( $post_id, 'email', true );
+		if ( $email ) {
+			echo '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>';
+		}
+		return;
+	}
+	if ( 'lead_source' === $column ) {
+		echo esc_html( get_post_meta( $post_id, 'lead_source', true ) );
+		return;
+	}
+}, 10, 2 );
+
+
+add_action( 'admin_post_nopriv_envision_contact', function() {
+	wp_safe_redirect( home_url( '/contact/?sent=ok' ) );
+	exit;
+} );
+add_action( 'admin_post_envision_contact', function() {
+	wp_safe_redirect( home_url( '/contact/?sent=ok' ) );
+	exit;
+} );
+
