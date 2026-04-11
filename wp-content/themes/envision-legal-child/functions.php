@@ -732,3 +732,211 @@ function el_handle_contact_form() {
 	exit;
 }
 
+
+/**
+ * Practice-area "Get a Free Call Back" intake form handler.
+ *
+ * A single handler for all practice-area callback forms. Each template posts
+ * to admin-post.php with action=el_practice_intake, a nonce, and a hidden
+ * el_source field that identifies the originating page.
+ */
+add_action( 'admin_post_nopriv_el_practice_intake', 'el_handle_practice_intake_form' );
+add_action( 'admin_post_el_practice_intake', 'el_handle_practice_intake_form' );
+
+function el_handle_practice_intake_form() {
+
+	/* ── Page config ─────────────────────────────────────────────────────── */
+	$pages = array(
+		'bsa' => array(
+			'slug'             => 'business-sales-acquisitions',
+			'anchor'           => 'bsa-enquiry-form',
+			'label'            => 'Business Sales & Acquisitions',
+			'required_selects' => array( 'bsa_role' ),
+			'text_fields'      => array(
+				'bsa_role'  => 'Role (Buying/Selling)',
+				'bsa_value' => 'Approximate deal value',
+			),
+			'textarea_fields'  => array( 'bsa_notes' => 'Additional notes' ),
+		),
+		'bc' => array(
+			'slug'             => 'business-contracts',
+			'anchor'           => 'bc-enquiry-form',
+			'label'            => 'Business Contracts',
+			'required_selects' => array( 'bc_type' ),
+			'text_fields'      => array( 'bc_type' => 'Contract type' ),
+			'textarea_fields'  => array( 'bc_notes' => 'Additional notes' ),
+		),
+		'uct' => array(
+			'slug'             => 'unfair-contract-terms',
+			'anchor'           => 'uct-enquiry-form',
+			'label'            => 'Unfair Contract Terms',
+			'required_selects' => array( 'uct_need' ),
+			'text_fields'      => array( 'uct_need' => 'Help needed' ),
+			'textarea_fields'  => array( 'uct_notes' => 'Additional notes' ),
+		),
+		'sha' => array(
+			'slug'             => 'shareholder-agreements',
+			'anchor'           => 'sha-enquiry-form',
+			'label'            => 'Shareholder Agreements',
+			'required_selects' => array( 'sha_shareholders' ),
+			'text_fields'      => array(
+				'sha_shareholders' => 'Number of shareholders',
+				'sha_incorporated' => 'Company incorporated',
+			),
+			'array_fields'     => array( 'sha_concerns' => 'Main concerns' ),
+			'textarea_fields'  => array( 'sha_notes' => 'Additional notes' ),
+		),
+		'sl' => array(
+			'slug'             => 'startup-legals',
+			'anchor'           => 'sl-enquiry-form',
+			'label'            => 'Startup Legals',
+			'required_selects' => array( 'sl_stage', 'sl_need' ),
+			'text_fields'      => array(
+				'sl_stage' => 'Startup stage',
+				'sl_need'  => 'Primary need',
+			),
+			'textarea_fields'  => array( 'sl_notes' => 'Additional notes' ),
+		),
+		'ip' => array(
+			'slug'             => 'intellectual-property',
+			'anchor'           => 'ip-enquiry-form',
+			'label'            => 'Intellectual Property',
+			'required_selects' => array( 'ip_type' ),
+			'text_fields'      => array( 'ip_type' => 'IP matter type' ),
+			'textarea_fields'  => array( 'ip_notes' => 'Additional notes' ),
+		),
+		'fgc' => array(
+			'slug'             => 'fractional-general-counsel',
+			'anchor'           => 'fgc-enquiry-form',
+			'label'            => 'Fractional General Counsel',
+			'required_selects' => array( 'fgc_size' ),
+			'text_fields'      => array(
+				'fgc_company' => 'Company',
+				'fgc_size'    => 'Number of employees',
+				'fgc_spend'   => 'Monthly legal spend',
+			),
+			'textarea_fields'  => array( 'fgc_notes' => 'Additional notes' ),
+		),
+	);
+
+	/* ── Determine source & redirect base ────────────────────────────────── */
+	$source = isset( $_POST['el_source'] ) ? sanitize_key( wp_unslash( $_POST['el_source'] ) ) : '';
+
+	if ( ! isset( $pages[ $source ] ) ) {
+		wp_safe_redirect( home_url( '/' ) );
+		exit;
+	}
+
+	$cfg           = $pages[ $source ];
+	$redirect_base = home_url( '/' . $cfg['slug'] . '/' );
+	$anchor        = $cfg['anchor'];
+
+	/* ── Nonce ───────────────────────────────────────────────────────────── */
+	$nonce = isset( $_POST['el_practice_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['el_practice_nonce'] ) ) : '';
+	if ( ! $nonce || ! wp_verify_nonce( $nonce, 'el_practice_intake' ) ) {
+		wp_safe_redirect( add_query_arg( 'enquiry', 'error', $redirect_base ) . '#' . $anchor );
+		exit;
+	}
+
+	/* ── Common fields ───────────────────────────────────────────────────── */
+	$prefix = $source . '_';
+	$name   = isset( $_POST[ $prefix . 'name' ] )  ? sanitize_text_field( wp_unslash( $_POST[ $prefix . 'name' ] ) )  : '';
+	$email  = isset( $_POST[ $prefix . 'email' ] ) ? sanitize_email( wp_unslash( $_POST[ $prefix . 'email' ] ) )      : '';
+	$phone  = isset( $_POST[ $prefix . 'phone' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $prefix . 'phone' ] ) ) : '';
+
+	if ( empty( $name ) || ! is_email( $email ) || empty( $phone ) ) {
+		wp_safe_redirect( add_query_arg( 'enquiry', 'invalid', $redirect_base ) . '#' . $anchor );
+		exit;
+	}
+
+	/* ── Required selects ────────────────────────────────────────────────── */
+	foreach ( $cfg['required_selects'] as $field ) {
+		$val = isset( $_POST[ $field ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) : '';
+		if ( empty( $val ) ) {
+			wp_safe_redirect( add_query_arg( 'enquiry', 'invalid', $redirect_base ) . '#' . $anchor );
+			exit;
+		}
+	}
+
+	/* ── Collect all extra fields for meta + email body ──────────────────── */
+	$meta        = array( 'phone' => $phone, 'page_url' => $redirect_base );
+	$email_lines = '';
+
+	// Text / select fields.
+	if ( ! empty( $cfg['text_fields'] ) ) {
+		foreach ( $cfg['text_fields'] as $field => $label ) {
+			$val               = isset( $_POST[ $field ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) : '';
+			$meta_key          = str_replace( $prefix, '', $field );
+			$meta[ $meta_key ] = $val;
+			$email_lines      .= $label . ': ' . ( $val ? $val : '(not provided)' ) . "\n";
+		}
+	}
+
+	// Array (checkbox) fields.
+	if ( ! empty( $cfg['array_fields'] ) ) {
+		foreach ( $cfg['array_fields'] as $field => $label ) {
+			$raw               = isset( $_POST[ $field ] ) ? wp_unslash( $_POST[ $field ] ) : array();
+			$val               = is_array( $raw ) ? implode( ', ', array_map( 'sanitize_text_field', $raw ) ) : sanitize_text_field( $raw );
+			$meta_key          = str_replace( $prefix, '', $field );
+			$meta[ $meta_key ] = $val;
+			$email_lines      .= $label . ': ' . ( $val ? $val : '(none selected)' ) . "\n";
+		}
+	}
+
+	// Textarea fields.
+	if ( ! empty( $cfg['textarea_fields'] ) ) {
+		foreach ( $cfg['textarea_fields'] as $field => $label ) {
+			$val               = isset( $_POST[ $field ] ) ? sanitize_textarea_field( wp_unslash( $_POST[ $field ] ) ) : '';
+			$meta_key          = str_replace( $prefix, '', $field );
+			$meta[ $meta_key ] = $val;
+			$email_lines      .= $label . ":\n" . ( $val ? $val : '(not provided)' ) . "\n";
+		}
+	}
+
+	/* ── Store lead ──────────────────────────────────────────────────────── */
+	el_store_lead(
+		'practice-' . $source . '-callback',
+		$name,
+		$email,
+		$meta
+	);
+
+	/* ── Admin email ─────────────────────────────────────────────────────── */
+	$admin_to      = get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' );
+	$safe_name     = str_replace( array( "\r", "\n" ), '', $name );
+	$admin_subject = 'New ' . $cfg['label'] . ' Enquiry from ' . $safe_name . ' — Envision Legal';
+	$admin_body    = 'New ' . $cfg['label'] . " callback enquiry from the website.\n\n"
+		. 'Name: '  . $name  . "\n"
+		. 'Email: ' . $email . "\n"
+		. 'Phone: ' . $phone . "\n"
+		. $email_lines . "\n"
+		. 'Page: '         . $redirect_base              . "\n"
+		. 'Time (UTC): '   . gmdate( 'Y-m-d H:i:s' )    . "\n";
+
+	$admin_headers = array(
+		'Content-Type: text/plain; charset=UTF-8',
+		'Reply-To: ' . $safe_name . ' <' . $email . '>',
+	);
+
+	$sent = wp_mail( $admin_to, $admin_subject, $admin_body, $admin_headers );
+
+	/* ── Confirmation email to user ──────────────────────────────────────── */
+	$user_subject = 'We received your enquiry — Envision Legal';
+	$user_body    = 'Hi ' . $name . ",\n\n"
+		. "Thanks for getting in touch. We've received your enquiry and will respond within one business day.\n\n"
+		. "If your matter is urgent, feel free to call us directly.\n\n"
+		. "Regards,\nEnvision Legal\n";
+
+	$user_headers = array( 'Reply-To: Envision Legal <' . $admin_to . '>' );
+
+	wp_mail( $email, $user_subject, $user_body, $user_headers );
+
+	/* ── Redirect ────────────────────────────────────────────────────────── */
+	if ( $sent ) {
+		wp_safe_redirect( add_query_arg( 'enquiry', 'ok', $redirect_base ) . '#' . $anchor );
+	} else {
+		wp_safe_redirect( add_query_arg( 'enquiry', 'error', $redirect_base ) . '#' . $anchor );
+	}
+	exit;
+}
+
