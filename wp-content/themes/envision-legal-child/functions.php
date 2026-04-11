@@ -663,7 +663,8 @@ function el_handle_contact_form() {
 	$redirect_base = home_url( '/contact/' );
 
 	// Nonce check.
-	if ( ! isset( $_POST['el_contact_nonce'] ) || ! wp_verify_nonce( $_POST['el_contact_nonce'], 'envision_contact' ) ) {
+	$nonce = isset( $_POST['el_contact_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['el_contact_nonce'] ) ) : '';
+	if ( ! $nonce || ! wp_verify_nonce( $nonce, 'envision_contact' ) ) {
 		wp_safe_redirect( add_query_arg( 'sent', 'error', $redirect_base ) );
 		exit;
 	}
@@ -694,7 +695,8 @@ function el_handle_contact_form() {
 
 	// Admin email.
 	$admin_to      = get_theme_mod( 'envision_legal_email', 'hello@envisionlegal.com.au' );
-	$admin_subject = 'New Contact Message from ' . $name . ' — Envision Legal';
+	$safe_name     = str_replace( array( "\r", "\n" ), '', $name );
+	$admin_subject = 'New Contact Message from ' . $safe_name . ' — Envision Legal';
 	$admin_body    = "New contact form submission (Send Us a Message).\n\n"
 		. 'Name: '    . $name    . "\n"
 		. 'Email: '   . $email   . "\n"
@@ -705,7 +707,7 @@ function el_handle_contact_form() {
 
 	$admin_headers = array(
 		'Content-Type: text/plain; charset=UTF-8',
-		'Reply-To: ' . $name . ' <' . $email . '>',
+		'Reply-To: ' . $safe_name . ' <' . $email . '>',
 	);
 
 	$sent = wp_mail( $admin_to, $admin_subject, $admin_body, $admin_headers );
