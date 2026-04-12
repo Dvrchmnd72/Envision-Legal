@@ -509,6 +509,33 @@ add_action( 'init', function() {
 } );
 
 /**
+ * Return a human-readable label for a lead source slug.
+ *
+ * @param  string $source  The raw source slug stored in post meta.
+ * @return string          Human-readable label, or a title-cased fallback.
+ */
+function el_lead_source_label( $source ) {
+	$map = array(
+		'practice-bsa-callback'        => 'Business Sales & Acquisitions — Callback',
+		'practice-bc-callback'         => 'Business Contracts — Callback',
+		'practice-uct-callback'        => 'Unfair Contract Terms — Callback',
+		'practice-sha-callback'        => 'Shareholder Agreements — Callback',
+		'practice-sl-callback'         => 'Startup Legals — Callback',
+		'practice-ip-callback'         => 'Intellectual Property — Callback',
+		'practice-fgc-callback'        => 'Fractional General Counsel — Callback',
+		'fractional-counsel-info-pack' => 'Fractional Counsel — Info Pack Download',
+		'contact-send-us-a-message'    => 'Contact — Send Us a Message',
+	);
+
+	if ( isset( $map[ $source ] ) ) {
+		return $map[ $source ];
+	}
+
+	// Fallback: title-case the slug.
+	return ucwords( str_replace( '-', ' ', $source ) );
+}
+
+/**
  * Store a lead in WP Admin (CPT: el_lead).
  *
  * @return int|WP_Error Lead post ID or error.
@@ -522,7 +549,7 @@ function el_store_lead( $source, $name, $email, $meta = array() ) {
 		array(
 			'post_type'   => 'el_lead',
 			'post_status' => 'publish',
-			'post_title'  => ucfirst( str_replace( '-', ' ', $source ) ) . ' — ' . $email,
+			'post_title'  => el_lead_source_label( $source ) . ' — ' . $email,
 		)
 	);
 
@@ -625,11 +652,12 @@ add_filter( 'manage_el_lead_posts_columns', function( $columns ) {
 		$new['cb'] = $columns['cb'];
 	}
 
-	$new['title']       = 'Lead';
-	$new['lead_name']   = 'Name';
-	$new['lead_email']  = 'Email';
-	$new['lead_source'] = 'Source';
-	$new['date']        = $columns['date'] ?? 'Date';
+	$new['title']        = 'Lead';
+	$new['lead_name']    = 'Name';
+	$new['lead_email']   = 'Email';
+	$new['lead_source']  = 'Source';
+	$new['lead_details'] = 'Details';
+	$new['date']         = $columns['date'] ?? 'Date';
 
 	return $new;
 } );
@@ -647,11 +675,141 @@ add_action( 'manage_el_lead_posts_custom_column', function( $column, $post_id ) 
 		return;
 	}
 	if ( 'lead_source' === $column ) {
-		echo esc_html( get_post_meta( $post_id, 'lead_source', true ) );
+		$source = get_post_meta( $post_id, 'lead_source', true );
+		echo esc_html( el_lead_source_label( $source ) );
+		return;
+	}
+	if ( 'lead_details' === $column ) {
+		// Keys that are already shown in other columns or are internal.
+		$skip = array( 'lead_source', 'name', 'email', 'created_utc', 'ip', 'user_agent', 'page_url', 'page', 'pdf_url' );
+		$all  = get_post_meta( $post_id );
+		$bits = array();
+
+		foreach ( $all as $key => $values ) {
+			if ( strpos( $key, '_' ) === 0 || in_array( $key, $skip, true ) ) {
+				continue;
+			}
+			$val = $values[0] ?? '';
+			if ( '' === $val ) {
+				continue;
+			}
+			$label  = el_lead_meta_label( $key );
+			$bits[] = $label . ': ' . wp_trim_words( $val, 8, '…' );
+		}
+
+		echo esc_html( implode( ' | ', $bits ) );
 		return;
 	}
 }, 10, 2 );
 
+/**
+ * Human-readable labels for known lead meta keys.
+ *
+ * @param  string $key  The raw meta key.
+ * @return string       Readable label.
+ */
+function el_lead_meta_label( $key ) {
+	$labels = array(
+		'lead_source'      => 'Source',
+		'name'             => 'Name',
+		'email'            => 'Email',
+		'phone'            => 'Phone',
+		'created_utc'      => 'Created (UTC)',
+		'ip'               => 'IP Address',
+		'user_agent'       => 'User Agent',
+		'page_url'         => 'Page URL',
+		'page'             => 'Page',
+		'pdf_url'          => 'PDF URL',
+		'message'          => 'Message',
+		'role'             => 'Role',
+		'value'            => 'Deal Value',
+		'notes'            => 'Notes',
+		'type'             => 'Type',
+		'need'             => 'Help Needed',
+		'shareholders'     => 'Shareholders',
+		'incorporated'     => 'Incorporated',
+		'concerns'         => 'Concerns',
+		'stage'            => 'Stage',
+		'company'          => 'Company',
+		'size'             => 'Number of Employees',
+		'spend'            => 'Monthly Legal Spend',
+		'bsa_role'         => 'Role (Buying/Selling)',
+		'bsa_value'        => 'Approximate Deal Value',
+		'bsa_notes'        => 'Additional Notes',
+		'bc_type'          => 'Contract Type',
+		'bc_notes'         => 'Additional Notes',
+		'uct_need'         => 'Help Needed',
+		'uct_notes'        => 'Additional Notes',
+		'sha_shareholders' => 'Number of Shareholders',
+		'sha_incorporated' => 'Company Incorporated',
+		'sha_concerns'     => 'Main Concerns',
+		'sha_notes'        => 'Additional Notes',
+		'sl_stage'         => 'Startup Stage',
+		'sl_need'          => 'Primary Need',
+		'sl_notes'         => 'Additional Notes',
+		'ip_type'          => 'IP Matter Type',
+		'ip_notes'         => 'Additional Notes',
+		'fgc_company'      => 'Company',
+		'fgc_size'         => 'Number of Employees',
+		'fgc_spend'        => 'Monthly Legal Spend',
+		'fgc_notes'        => 'Additional Notes',
+	);
+
+	if ( isset( $labels[ $key ] ) ) {
+		return $labels[ $key ];
+	}
+
+	// Fallback: title-case the key.
+	return ucwords( str_replace( '_', ' ', $key ) );
+}
+
+/**
+ * Read-only meta box on the el_lead edit screen.
+ */
+add_action( 'add_meta_boxes_el_lead', function() {
+	add_meta_box(
+		'el_lead_details_meta_box',
+		'Lead Details',
+		'el_render_lead_details_meta_box',
+		'el_lead',
+		'normal',
+		'high'
+	);
+} );
+
+function el_render_lead_details_meta_box( $post ) {
+	$all_meta = get_post_meta( $post->ID );
+
+	if ( empty( $all_meta ) ) {
+		echo '<p>No meta data stored for this lead.</p>';
+		return;
+	}
+
+	echo '<table class="widefat fixed striped" style="border:0">';
+	echo '<thead><tr><th style="width:25%">Field</th><th>Value</th></tr></thead><tbody>';
+
+	foreach ( $all_meta as $key => $values ) {
+		// Skip internal WP keys.
+		if ( strpos( $key, '_' ) === 0 ) {
+			continue;
+		}
+
+		$label = el_lead_meta_label( $key );
+		$val   = $values[0] ?? '';
+
+		// If the source field, show the human-readable label.
+		if ( 'lead_source' === $key ) {
+			$val = el_lead_source_label( $val );
+		}
+
+		echo '<tr>';
+		echo '<td><strong>' . esc_html( $label ) . '</strong></td>';
+		echo '<td>' . nl2br( esc_html( $val ) ) . '</td>';
+		echo '</tr>';
+	}
+
+	echo '</tbody></table>';
+}
 
 /**
  * Contact page: "Send Us a Message" fallback form handler.
