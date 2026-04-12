@@ -1389,6 +1389,54 @@ function el_get_seo_data() {
 		);
 	}
 
+	// ── About ────────────────────────────────────────────────────────────────
+	if ( 'page-about.php' === $template ) {
+		return array(
+			'title'       => 'About Envision Legal | Commercial Lawyers South-West Sydney',
+			'description' => 'Learn about Envision Legal — a boutique commercial law firm in South-West Sydney. We provide fixed-fee, commercially-minded legal advice to businesses across Campbelltown, Liverpool and Parramatta.',
+			'schema'      => array(
+				array(
+					'@context'    => 'https://schema.org',
+					'@type'       => 'AboutPage',
+					'name'        => 'About Envision Legal',
+					'url'         => home_url( '/about/' ),
+					'description' => 'Envision Legal is a boutique commercial law firm in South-West Sydney providing fixed-fee, commercially-minded legal advice to businesses.',
+					'publisher'   => array(
+						'@type' => 'LegalService',
+						'name'  => 'Envision Legal',
+						'url'   => home_url( '/' ),
+					),
+				),
+				$local_business_schema,
+			),
+			'breadcrumb' => array(),
+		);
+	}
+
+	// ── Book a Consultation ──────────────────────────────────────────────────
+	if ( 'page-book.php' === $template ) {
+		return array(
+			'title'       => 'Book a Free Consultation | Envision Legal',
+			'description' => 'Book your free 30-minute consultation with Envision Legal. Our commercial lawyers serve businesses across South-West Sydney including Campbelltown, Liverpool and Parramatta.',
+			'schema'      => array(
+				array(
+					'@context'        => 'https://schema.org',
+					'@type'           => 'LegalService',
+					'name'            => 'Envision Legal',
+					'url'             => $home,
+					'telephone'       => $phone,
+					'potentialAction' => array(
+						'@type'  => 'ReserveAction',
+						'name'   => 'Book a Free Consultation',
+						'target' => home_url( '/book/' ),
+					),
+				),
+				$local_business_schema,
+			),
+			'breadcrumb' => array(),
+		);
+	}
+
 	// ── Fallback ─────────────────────────────────────────────────────────────
 	$fallback_title = is_singular()
 		? get_the_title() . ' | ' . $site_name
