@@ -27,7 +27,7 @@ envision_legal_page_open( 'el-page--home' );
 				<a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="el-btn el-btn--primary">
 					<?php esc_html_e( 'Book a Free Consultation', 'envision-legal' ); ?>
 				</a>
-				<a href="<?php echo esc_url( home_url( '/practiceareas' ) ); ?>" class="el-btn el-btn--outline">
+				<a href="<?php echo esc_url( home_url( '/practice-areas/' ) ); ?>" class="el-btn el-btn--outline">
 					<?php esc_html_e( 'Our Practice Areas', 'envision-legal' ); ?>
 				</a>
 			</div>
@@ -113,7 +113,7 @@ envision_legal_page_open( 'el-page--home' );
 					</div>
 					<h3><?php echo esc_html( $area['title'] ); ?></h3>
 					<p><?php echo esc_html( $area['desc'] ); ?></p>
-					<a href="<?php echo esc_url( home_url( '/practiceareas' ) ); ?>" class="el-card__link">
+					<a href="<?php echo esc_url( home_url( '/practice-areas/' ) ); ?>" class="el-card__link">
 						<?php esc_html_e( 'Learn more &rarr;', 'envision-legal' ); ?>
 					</a>
 				</div>

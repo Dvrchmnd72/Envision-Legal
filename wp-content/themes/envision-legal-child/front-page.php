@@ -26,7 +26,7 @@ envision_legal_page_open( 'el-page--home' );
 				<a href="<?php echo esc_url( home_url( '/book/' ) ); ?>" class="el-btn el-btn--primary">
 					<?php esc_html_e( 'Book Consultation', 'envision-legal' ); ?>
 				</a>
-				<a href="<?php echo esc_url( home_url( '/practiceareas' ) ); ?>" class="el-btn el-btn--outline">
+				<a href="<?php echo esc_url( home_url( '/practice-areas/' ) ); ?>" class="el-btn el-btn--outline">
 					<?php esc_html_e( 'Our Practice Areas', 'envision-legal' ); ?>
 				</a>
 				<a href="<?php echo esc_url( home_url( '/referrals' ) ); ?>" class="el-btn el-btn--outline">
@@ -126,7 +126,7 @@ foreach ( $practice_areas as $area ) :
 					</div>
 					<h3><?php echo esc_html( $area['title'] ); ?></h3>
 					<p><?php echo esc_html( $area['desc'] ); ?></p>
-					<a href="<?php echo esc_url( home_url( isset( $area['link'] ) ? $area['link'] : '/practiceareas' ) ); ?>" class="el-card__link">
+					<a href="<?php echo esc_url( home_url( isset( $area['link'] ) ? $area['link'] : '/practice-areas/' ) ); ?>" class="el-card__link">
 						<?php esc_html_e( 'Learn more &rarr;', 'envision-legal' ); ?>
 					</a>
 				</div>

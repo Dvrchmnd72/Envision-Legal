@@ -253,7 +253,7 @@ HTML,
 
 	array(
 		'title'    => 'Practice Areas',
-		'slug'     => 'practiceareas',
+		'slug'     => 'practice-areas',
 		'template' => 'page-practiceareas.php',
 		'content'  => <<<'HTML'
 <p>We focus exclusively on commercial law—which means you receive deep, specialised advice rather than a generalist perspective. Our practice areas span the full lifecycle of a business, from early-stage legal foundations to growth, exits and everything in between.</p>
@@ -262,14 +262,14 @@ HTML,
 
 	array(
 		'title'    => 'Terms of Use',
-		'slug'     => 'termsofuse',
+		'slug'     => 'terms-of-use',
 		'template' => 'page-termsofuse.php',
 		'content'  => '',  // Template provides default placeholder terms
 	),
 
 	array(
 		'title'    => 'Privacy Policy',
-		'slug'     => 'privacypolicy',
+		'slug'     => 'privacy-policy',
 		'template' => 'page-privacypolicy.php',
 		'content'  => '',  // Template provides default placeholder policy
 	),

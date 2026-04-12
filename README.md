@@ -34,9 +34,9 @@ A deployable child theme for the **Astra** parent theme, built for the Envision 
 | `/` (front page) | `front-page.php` |
 | `/about` | `page-about.php` |
 | `/contact` | `page-contact.php` |
-| `/practiceareas` | `page-practiceareas.php` |
-| `/termsofuse` | `page-termsofuse.php` |
-| `/privacypolicy` | `page-privacypolicy.php` |
+| `/practice-areas` | `page-practiceareas.php` |
+| `/terms-of-use` | `page-termsofuse.php` |
+| `/privacy-policy` | `page-privacypolicy.php` |
 | `/south-west-sydney-lawyers` | `page-south-west-sydney-lawyers.php` |
 | Blog single | `single.php` |
 | Blog index / archive | `archive.php` |
@@ -170,7 +170,7 @@ wp eval-file /path/to/wordpress/tools/seed-content.php
 ```
 
 **What the seeder does:**
-- Creates/updates pages: `home`, `about`, `contact`, `practiceareas`, `termsofuse`, `privacypolicy`, `south-west-sydney-lawyers`
+- Creates/updates pages: `home`, `about`, `contact`, `practice-areas`, `terms-of-use`, `privacy-policy`, `south-west-sydney-lawyers`
 - Sets the `home` page as the WordPress front page
 - Creates/updates 7 blog posts (business sales, startup legals, trademarks, unfair contract terms, fractional counsel, shareholders agreement, secret stuff)
 - Assigns page templates, categories and tags
