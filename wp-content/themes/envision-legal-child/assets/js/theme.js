@@ -219,6 +219,103 @@
   style.textContent = '.is-visible { opacity: 1 !important; transform: translateY(0) !important; }';
   document.head.appendChild(style);
 
+  /* ── Exit-intent / Scroll-depth Popup ───────────────────────────────────── */
+  function initExitPopup() {
+    var STORAGE_KEY = 'el_popup_dismissed';
+    var MIN_TIME_MS  = 30000; // 30 seconds minimum on page
+    var SCROLL_DEPTH = 0.60;  // 60% scroll depth
+
+    // Don't show if already dismissed this session.
+    if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+    // Don't show if the popup element doesn't exist on this page.
+    var $popup    = $('#el-exit-popup');
+    var $overlay  = $('#el-exit-overlay');
+    if (!$popup.length) return;
+
+    var shown       = false;
+    var pageLoadTime = Date.now();
+
+    function dismiss() {
+      $overlay.removeClass('is-visible');
+      $popup.removeClass('is-visible').attr('aria-hidden', 'true');
+      sessionStorage.setItem(STORAGE_KEY, '1');
+      // Re-enable body scroll
+      $('body').css('overflow', '');
+      shown = true;
+    }
+
+    function showPopup() {
+      if (shown) return;
+      if ((Date.now() - pageLoadTime) < MIN_TIME_MS) return;
+      shown = true;
+      $overlay.addClass('is-visible');
+      $popup.addClass('is-visible').attr('aria-hidden', 'false');
+      // Trap focus — move to first focusable element
+      $popup.find('a, button').first().trigger('focus');
+      // Prevent body scroll
+      $('body').css('overflow', 'hidden');
+    }
+
+    // Exit-intent: mouse leaves the top of the viewport (desktop only).
+    $(document).on('mouseleave.exitpopup', function (e) {
+      if (e.clientY <= 0) {
+        showPopup();
+      }
+    });
+
+    // Scroll-depth: fire at 60% of page height.
+    $(window).on('scroll.exitpopup', function () {
+      if (shown) {
+        $(window).off('scroll.exitpopup');
+        return;
+      }
+      var scrolled      = $(window).scrollTop() + $(window).height();
+      var pageHeight    = $(document).height();
+      var depth         = scrolled / pageHeight;
+      if (depth >= SCROLL_DEPTH) {
+        showPopup();
+        $(window).off('scroll.exitpopup');
+      }
+    });
+
+    // Close on overlay click.
+    $overlay.on('click', function () {
+      dismiss();
+    });
+
+    // Close on dismiss button click.
+    $popup.on('click', '.el-popup__close, .el-popup__dismiss', function () {
+      dismiss();
+    });
+
+    // Close on Escape key.
+    $(document).on('keydown.exitpopup', function (e) {
+      if (e.key === 'Escape' && shown && $popup.hasClass('is-visible')) {
+        dismiss();
+      }
+    });
+
+    // Focus trap: keep Tab inside the modal when visible.
+    $popup.on('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var $focusable = $popup.find('a, button, [tabindex]:not([tabindex="-1"])');
+      var $first = $focusable.first();
+      var $last  = $focusable.last();
+      if (e.shiftKey) {
+        if ($(document.activeElement).is($first)) {
+          e.preventDefault();
+          $last.trigger('focus');
+        }
+      } else {
+        if ($(document.activeElement).is($last)) {
+          e.preventDefault();
+          $first.trigger('focus');
+        }
+      }
+    });
+  }
+
   /* ── Init ────────────────────────────────────────────────────────────────── */
   $(document).ready(function () {
     initScrollReveal();
@@ -226,6 +323,7 @@
     initContactForm();
     openFromHash();
     initMobileSubmenus();
+    initExitPopup();
   });
 
 })(jQuery);
