@@ -1177,26 +1177,6 @@ function el_get_seo_data() {
 		);
 	};
 
-	// Helper to build breadcrumb schema.
-	$breadcrumb_schema = function ( $items ) use ( $home ) {
-		$elements = array();
-		$pos      = 1;
-		foreach ( $items as $name => $url ) {
-			$elements[] = array(
-				'@type'    => 'ListItem',
-				'position' => $pos,
-				'name'     => $name,
-				'item'     => $url ? $url : $home,
-			);
-			$pos++;
-		}
-		return array(
-			'@context'        => 'https://schema.org',
-			'@type'           => 'BreadcrumbList',
-			'itemListElement' => $elements,
-		);
-	};
-
 	$template = get_page_template_slug();
 
 	// ── Front Page ──────────────────────────────────────────────────────────
@@ -1544,6 +1524,9 @@ function el_robots_txt( $output, $public ) {
 
 /**
  * Register the sitemap rewrite rule.
+ *
+ * Note: After first activation, visit Settings → Permalinks (or run
+ * flush_rewrite_rules()) so WordPress picks up the new rule.
  */
 add_action( 'init', 'el_sitemap_rewrite' );
 function el_sitemap_rewrite() {
