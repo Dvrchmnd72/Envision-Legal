@@ -516,7 +516,7 @@ add_action( 'init', function() {
  */
 function el_lead_source_label( $source ) {
 	$map = array(
-		'practice-bsa-callback'        => 'Business Sales &amp; Acquisitions — Callback',
+		'practice-bsa-callback'        => 'Business Sales & Acquisitions — Callback',
 		'practice-bc-callback'         => 'Business Contracts — Callback',
 		'practice-uct-callback'        => 'Unfair Contract Terms — Callback',
 		'practice-sha-callback'        => 'Shareholder Agreements — Callback',
@@ -532,7 +532,7 @@ function el_lead_source_label( $source ) {
 	}
 
 	// Fallback: title-case the slug.
-	return ucfirst( str_replace( '-', ' ', $source ) );
+	return ucwords( str_replace( '-', ' ', $source ) );
 }
 
 /**
@@ -760,7 +760,7 @@ function el_lead_meta_label( $key ) {
 	}
 
 	// Fallback: title-case the key.
-	return ucfirst( str_replace( '_', ' ', $key ) );
+	return ucwords( str_replace( '_', ' ', $key ) );
 }
 
 /**
