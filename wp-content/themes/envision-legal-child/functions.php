@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-define( 'ENVISION_LEGAL_VERSION', '1.1.20' );
+define( 'ENVISION_LEGAL_VERSION', '1.1.21' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
@@ -244,7 +244,7 @@ function envision_legal_fallback_menu() {
 	echo '<ul class="el-nav__list">';
 	echo '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'envision-legal' ) . '</a></li>';
 	echo '<li><a href="' . esc_url( home_url( '/about' ) ) . '">' . esc_html__( 'About', 'envision-legal' ) . '</a></li>';
-	echo '<li><a href="' . esc_url( home_url( '/practiceareas' ) ) . '">' . esc_html__( 'Practice Areas', 'envision-legal' ) . '</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/practice-areas/' ) ) . '">' . esc_html__( 'Practice Areas', 'envision-legal' ) . '</a></li>';
 	echo '<li><a href="' . esc_url( get_permalink( get_option( 'page_for_posts' ) ) ) . '">' . esc_html__( 'Blog', 'envision-legal' ) . '</a></li>';
 	echo '<li><a href="' . esc_url( home_url( '/contact' ) ) . '">' . esc_html__( 'Contact', 'envision-legal' ) . '</a></li>';
 	echo '</ul>';
@@ -302,9 +302,9 @@ function envision_legal_footer() {
 					);
 					?>
 					&nbsp;&mdash;&nbsp;
-					<a href="<?php echo esc_url( home_url( '/privacypolicy' ) ); ?>"><?php esc_html_e( 'Privacy Policy', 'envision-legal' ); ?></a>
+					<a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>"><?php esc_html_e( 'Privacy Policy', 'envision-legal' ); ?></a>
 					&nbsp;&middot;&nbsp;
-					<a href="<?php echo esc_url( home_url( '/termsofuse' ) ); ?>"><?php esc_html_e( 'Terms of Use', 'envision-legal' ); ?></a>
+					<a href="<?php echo esc_url( home_url( '/terms-of-use/' ) ); ?>"><?php esc_html_e( 'Terms of Use', 'envision-legal' ); ?></a>
 				</p>
 			</div>
 		</div>
@@ -381,6 +381,24 @@ add_action( 'template_redirect', function () {
 			wp_safe_redirect( get_permalink( $posts_page_id ), 301 );
 			exit;
 		}
+	}
+} );
+
+/**
+ * 301 redirects for legacy unhyphenated slugs → canonical hyphenated versions.
+ */
+add_action( 'template_redirect', function () {
+	$request = untrailingslashit( strtok( $_SERVER['REQUEST_URI'] ?? '', '?' ) );
+
+	$redirects = array(
+		'/practiceareas'  => '/practice-areas/',
+		'/termsofuse'     => '/terms-of-use/',
+		'/privacypolicy'  => '/privacy-policy/',
+	);
+
+	if ( isset( $redirects[ $request ] ) ) {
+		wp_safe_redirect( home_url( $redirects[ $request ] ), 301 );
+		exit;
 	}
 } );
 
@@ -1205,7 +1223,7 @@ function el_get_seo_data() {
 			),
 			'breadcrumb' => array(
 				'Home'               => $home,
-				'Practice Areas'     => home_url( '/practiceareas/' ),
+				'Practice Areas'     => home_url( '/practice-areas/' ),
 				'Business Contracts' => home_url( '/business-contracts/' ),
 			),
 		);
@@ -1226,7 +1244,7 @@ function el_get_seo_data() {
 			),
 			'breadcrumb' => array(
 				'Home'                         => $home,
-				'Practice Areas'               => home_url( '/practiceareas/' ),
+				'Practice Areas'               => home_url( '/practice-areas/' ),
 				'Business Sales & Acquisitions' => home_url( '/business-sales-acquisitions/' ),
 			),
 		);
@@ -1248,7 +1266,7 @@ function el_get_seo_data() {
 			),
 			'breadcrumb' => array(
 				'Home'                    => $home,
-				'Practice Areas'          => home_url( '/practiceareas/' ),
+				'Practice Areas'          => home_url( '/practice-areas/' ),
 				'Shareholder Agreements'  => home_url( '/shareholder-agreements/' ),
 			),
 		);
@@ -1270,7 +1288,7 @@ function el_get_seo_data() {
 			),
 			'breadcrumb' => array(
 				'Home'           => $home,
-				'Practice Areas' => home_url( '/practiceareas/' ),
+				'Practice Areas' => home_url( '/practice-areas/' ),
 				'Startup Legals' => home_url( '/startup-legals/' ),
 			),
 		);
@@ -1292,7 +1310,7 @@ function el_get_seo_data() {
 			),
 			'breadcrumb' => array(
 				'Home'                  => $home,
-				'Practice Areas'        => home_url( '/practiceareas/' ),
+				'Practice Areas'        => home_url( '/practice-areas/' ),
 				'Intellectual Property'  => home_url( '/intellectual-property/' ),
 			),
 		);
@@ -1314,7 +1332,7 @@ function el_get_seo_data() {
 			),
 			'breadcrumb' => array(
 				'Home'                  => $home,
-				'Practice Areas'        => home_url( '/practiceareas/' ),
+				'Practice Areas'        => home_url( '/practice-areas/' ),
 				'Unfair Contract Terms'  => home_url( '/unfair-contract-terms/' ),
 			),
 		);
@@ -1591,8 +1609,8 @@ function el_robots_txt( $output, $public ) {
 	$output .= "Disallow: /wp-login.php\n";
 	$output .= "Disallow: /referrals/intake\n";
 	$output .= "Disallow: /referral-partner-terms\n";
-	$output .= "Disallow: /privacypolicy\n";
-	$output .= "Disallow: /termsofuse\n";
+	$output .= "Disallow: /privacy-policy\n";
+	$output .= "Disallow: /terms-of-use\n";
 	$output .= "Disallow: /?s=\n";
 	$output .= "Disallow: /*?s=\n";
 	$output .= "Disallow: /*?enquiry=\n";
@@ -1669,7 +1687,7 @@ function el_sitemap_render() {
 	// Note: referral-partner-terms is intentionally excluded (disallowed in robots.txt).
 	$static_pages = array(
 		array( 'loc' => $home,                                          'slug' => '',                           'priority' => '1.0',  'changefreq' => 'weekly' ),
-		array( 'loc' => home_url( '/practiceareas/' ),                  'slug' => 'practiceareas',              'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/practice-areas/' ),                  'slug' => 'practice-areas',             'priority' => '0.9',  'changefreq' => 'monthly' ),
 		array( 'loc' => home_url( '/business-contracts/' ),             'slug' => 'business-contracts',         'priority' => '0.9',  'changefreq' => 'monthly' ),
 		array( 'loc' => home_url( '/business-sales-acquisitions/' ),    'slug' => 'business-sales-acquisitions','priority' => '0.9',  'changefreq' => 'monthly' ),
 		array( 'loc' => home_url( '/shareholder-agreements/' ),         'slug' => 'shareholder-agreements',     'priority' => '0.9',  'changefreq' => 'monthly' ),

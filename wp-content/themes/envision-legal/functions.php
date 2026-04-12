@@ -244,7 +244,7 @@ function envision_legal_fallback_menu() {
 	echo '<ul class="el-nav__list">';
 	echo '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'envision-legal' ) . '</a></li>';
 	echo '<li><a href="' . esc_url( home_url( '/about' ) ) . '">' . esc_html__( 'About', 'envision-legal' ) . '</a></li>';
-	echo '<li><a href="' . esc_url( home_url( '/practiceareas' ) ) . '">' . esc_html__( 'Practice Areas', 'envision-legal' ) . '</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/practice-areas/' ) ) . '">' . esc_html__( 'Practice Areas', 'envision-legal' ) . '</a></li>';
 	echo '<li><a href="' . esc_url( home_url( '/blog' ) ) . '">' . esc_html__( 'Blog', 'envision-legal' ) . '</a></li>';
 	echo '<li><a href="' . esc_url( home_url( '/contact' ) ) . '">' . esc_html__( 'Contact', 'envision-legal' ) . '</a></li>';
 	echo '</ul>';
@@ -306,9 +306,9 @@ function envision_legal_footer() {
 					);
 					?>
 					&nbsp;&mdash;&nbsp;
-					<a href="<?php echo esc_url( home_url( '/privacypolicy' ) ); ?>"><?php esc_html_e( 'Privacy Policy', 'envision-legal' ); ?></a>
+					<a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>"><?php esc_html_e( 'Privacy Policy', 'envision-legal' ); ?></a>
 					&nbsp;&middot;&nbsp;
-					<a href="<?php echo esc_url( home_url( '/termsofuse' ) ); ?>"><?php esc_html_e( 'Terms of Use', 'envision-legal' ); ?></a>
+					<a href="<?php echo esc_url( home_url( '/terms-of-use/' ) ); ?>"><?php esc_html_e( 'Terms of Use', 'envision-legal' ); ?></a>
 				</p>
 			</div>
 		</div>
