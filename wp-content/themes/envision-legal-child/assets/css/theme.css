@@ -1047,3 +1047,30 @@ form select {
   min-height: 48px;
 }
 
+/* ── Breadcrumb navigation ────────────────────────────────────────────────── */
+.el-breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+.el-breadcrumb li + li::before {
+    content: "›";
+    color: var(--el-gold);
+    margin: 0 0.4em;
+}
+.el-breadcrumb a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+.el-breadcrumb a:hover {
+    color: var(--el-white);
+}
+.el-breadcrumb span[aria-current="page"] {
+    color: rgba(255, 255, 255, 0.45);
+}
+

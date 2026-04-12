@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-define( 'ENVISION_LEGAL_VERSION', '1.1.19' );
+define( 'ENVISION_LEGAL_VERSION', '1.1.20' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
@@ -1535,6 +1535,37 @@ function el_seo_head() {
 		echo wp_json_encode( $breadcrumb_block, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
 		echo "\n</script>\n";
 	}
+}
+
+/**
+ * Render visible breadcrumb navigation trail.
+ *
+ * Uses the breadcrumb data from el_get_seo_data() to output an accessible
+ * <nav> element. Intended for use inside .el-page-header hero sections.
+ */
+function el_render_breadcrumb() {
+	$seo        = el_get_seo_data();
+	$breadcrumb = $seo['breadcrumb'];
+
+	if ( empty( $breadcrumb ) ) {
+		return;
+	}
+
+	$items = array();
+	$keys  = array_keys( $breadcrumb );
+	$last  = end( $keys );
+
+	foreach ( $breadcrumb as $label => $url ) {
+		if ( $label === $last ) {
+			$items[] = '<li><span aria-current="page">' . esc_html( $label ) . '</span></li>';
+		} else {
+			$items[] = '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+		}
+	}
+
+	echo '<nav class="el-breadcrumb" aria-label="Breadcrumb">' . "\n";
+	echo '  <ol>' . "\n    " . implode( "\n    ", $items ) . "\n  </ol>\n";
+	echo "</nav>\n";
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
