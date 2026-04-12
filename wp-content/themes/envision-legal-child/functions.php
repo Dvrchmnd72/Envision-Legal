@@ -1669,7 +1669,8 @@ add_action( 'wp_head', 'el_gtm_datalayer_push', 0 );
 function el_gtm_datalayer_push() {
 	$event     = null;
 	$form_name = null;
-	$page_path = esc_js( wp_parse_url( home_url( isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/' ), PHP_URL_PATH ) ?? '/' );
+	$page_path = wp_parse_url( home_url( isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/' ), PHP_URL_PATH );
+	$page_path = $page_path ? $page_path : '/';
 
 	// Detect which success state is present.
 	$sent     = isset( $_GET['sent'] )     ? sanitize_key( $_GET['sent'] )     : '';
