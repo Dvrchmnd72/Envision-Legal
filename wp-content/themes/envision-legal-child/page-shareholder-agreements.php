@@ -10,6 +10,7 @@ envision_legal_page_open( 'el-page--practice' );
 
 <section class="el-page-header" aria-labelledby="sha-heading">
 	<div class="el-container">
+		<?php el_render_breadcrumb(); ?>
 						<p class="el-hero__eyebrow"><?php esc_html_e( 'Commercial Law · Fractional Counsel', 'envision-legal' ); ?></p>
 <h1 id="sha-heading">Shareholder &amp; Partnership Agreement Lawyers</h1>
 		<p>Protect your business, your shares and your relationships before a dispute forces the issue.</p>

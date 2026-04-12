@@ -10,6 +10,7 @@ envision_legal_page_open( 'el-page--practice' );
 
 <section class="el-page-header" aria-labelledby="bc-heading">
 	<div class="el-container">
+		<?php el_render_breadcrumb(); ?>
 						<p class="el-hero__eyebrow"><?php esc_html_e( 'Commercial Law · Fractional Counsel', 'envision-legal' ); ?></p>
 <h1 id="bc-heading">Business Contract Lawyers</h1>
 		<p>Contracts that are clear, enforceable and built around your commercial reality — not boilerplate.</p>

@@ -9,6 +9,7 @@ envision_legal_page_open( 'el-page--practice' );
 
 <section class="el-page-header" aria-labelledby="uct-heading">
 	<div class="el-container">
+		<?php el_render_breadcrumb(); ?>
 						<p class="el-hero__eyebrow"><?php esc_html_e( 'Commercial Law · Fractional Counsel', 'envision-legal' ); ?></p>
 <h1 id="uct-heading">Unfair Contract Terms Lawyers</h1>
 		<p>Protect your business from one-sided standard-form contracts &mdash; and ensure your own terms are compliant.</p>

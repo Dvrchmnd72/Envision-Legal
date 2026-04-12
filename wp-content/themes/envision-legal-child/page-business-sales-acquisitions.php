@@ -10,6 +10,7 @@ envision_legal_page_open( 'el-page--practice' );
 
 <section class="el-page-header" aria-labelledby="bsa-heading">
 	<div class="el-container">
+		<?php el_render_breadcrumb(); ?>
 						<p class="el-hero__eyebrow"><?php esc_html_e( 'Commercial Law · Fractional Counsel', 'envision-legal' ); ?></p>
 <h1 id="bsa-heading">Business Sales &amp; Acquisitions Lawyers</h1>
 		<p>Expert legal guidance from heads of agreement through to settlement — so your deal gets done right.</p>

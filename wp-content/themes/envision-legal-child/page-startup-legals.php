@@ -10,6 +10,7 @@ envision_legal_page_open( 'el-page--practice' );
 
 <section class="el-page-header" aria-labelledby="sl-heading">
 	<div class="el-container">
+		<?php el_render_breadcrumb(); ?>
 						<p class="el-hero__eyebrow"><?php esc_html_e( 'Commercial Law · Fractional Counsel', 'envision-legal' ); ?></p>
 <h1 id="sl-heading">Startup &amp; Emerging Company Lawyers</h1>
 		<p>Build your startup on a solid legal foundation — from co-founder agreements to investor-ready documents.</p>
