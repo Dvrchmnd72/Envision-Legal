@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-define( 'ENVISION_LEGAL_VERSION', '1.1.18' );
+define( 'ENVISION_LEGAL_VERSION', '1.1.19' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
@@ -1562,6 +1562,17 @@ function el_robots_txt( $output, $public ) {
 	$output .= "Disallow: /referral-partner-terms\n";
 	$output .= "Disallow: /privacypolicy\n";
 	$output .= "Disallow: /termsofuse\n";
+	$output .= "Disallow: /?s=\n";
+	$output .= "Disallow: /*?s=\n";
+	$output .= "Disallow: /*?enquiry=\n";
+	$output .= "Disallow: /*?sent=\n";
+	$output .= "Disallow: /*?download=\n";
+	$output .= "Disallow: /book/*?\n";
+	$output .= "\n";
+	$output .= "User-agent: Googlebot\n";
+	$output .= "Disallow: /wp-login.php\n";
+	$output .= "Disallow: /wp-admin/\n";
+	$output .= "Allow: /wp-admin/admin-ajax.php\n";
 	$output .= "\nSitemap: {$sitemap_url}\n";
 	return $output;
 }
@@ -1594,6 +1605,28 @@ function el_sitemap_query_var( $vars ) {
  * Intercept the request and serve XML sitemap if requested.
  */
 add_action( 'template_redirect', 'el_sitemap_render' );
+
+/**
+ * Return the last-modified date for a page identified by slug.
+ *
+ * @param string $slug Page slug (empty string for front page).
+ * @return string Date in Y-m-d format.
+ */
+function el_sitemap_lastmod( $slug ) {
+	if ( '' === $slug ) {
+		$front_page_id = (int) get_option( 'page_on_front' );
+		if ( $front_page_id ) {
+			return get_post_modified_time( 'Y-m-d', true, $front_page_id );
+		}
+		return gmdate( 'Y-m-d' );
+	}
+	$page = get_page_by_path( $slug );
+	if ( $page ) {
+		return get_post_modified_time( 'Y-m-d', true, $page );
+	}
+	return gmdate( 'Y-m-d' );
+}
+
 function el_sitemap_render() {
 	if ( ! get_query_var( 'el_sitemap' ) ) {
 		return;
@@ -1602,21 +1635,22 @@ function el_sitemap_render() {
 	$home = home_url( '/' );
 
 	// Static pages with priority and change frequency.
+	// Note: referral-partner-terms is intentionally excluded (disallowed in robots.txt).
 	$static_pages = array(
-		array( 'loc' => $home,                                          'priority' => '1.0',  'changefreq' => 'weekly' ),
-		array( 'loc' => home_url( '/practiceareas/' ),                  'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/business-contracts/' ),             'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/business-sales-acquisitions/' ),    'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/shareholder-agreements/' ),         'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/startup-legals/' ),                 'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/intellectual-property/' ),          'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/unfair-contract-terms/' ),          'priority' => '0.9',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/fractional-general-counsel/' ),     'priority' => '0.95', 'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/south-west-sydney-lawyers/' ),      'priority' => '0.85', 'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/referrals/' ),                      'priority' => '0.7',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/about/' ),                          'priority' => '0.7',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/contact/' ),                        'priority' => '0.8',  'changefreq' => 'monthly' ),
-		array( 'loc' => home_url( '/book/' ),                           'priority' => '0.8',  'changefreq' => 'monthly' ),
+		array( 'loc' => $home,                                          'slug' => '',                           'priority' => '1.0',  'changefreq' => 'weekly' ),
+		array( 'loc' => home_url( '/practiceareas/' ),                  'slug' => 'practiceareas',              'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/business-contracts/' ),             'slug' => 'business-contracts',         'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/business-sales-acquisitions/' ),    'slug' => 'business-sales-acquisitions','priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/shareholder-agreements/' ),         'slug' => 'shareholder-agreements',     'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/startup-legals/' ),                 'slug' => 'startup-legals',             'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/intellectual-property/' ),          'slug' => 'intellectual-property',      'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/unfair-contract-terms/' ),          'slug' => 'unfair-contract-terms',      'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/fractional-general-counsel/' ),     'slug' => 'fractional-general-counsel', 'priority' => '0.95', 'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/south-west-sydney-lawyers/' ),      'slug' => 'south-west-sydney-lawyers',  'priority' => '0.85', 'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/referrals/' ),                      'slug' => 'referrals',                  'priority' => '0.7',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/about/' ),                          'slug' => 'about',                      'priority' => '0.7',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/contact/' ),                        'slug' => 'contact',                    'priority' => '0.8',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/book/' ),                           'slug' => 'book',                       'priority' => '0.8',  'changefreq' => 'monthly' ),
 	);
 
 	// Blog posts – latest 50.
@@ -1635,6 +1669,7 @@ function el_sitemap_render() {
 	foreach ( $static_pages as $page ) {
 		echo "\t<url>\n";
 		echo "\t\t<loc>" . esc_url( $page['loc'] ) . "</loc>\n";
+		echo "\t\t<lastmod>" . esc_xml( el_sitemap_lastmod( $page['slug'] ) ) . "</lastmod>\n";
 		echo "\t\t<changefreq>" . esc_xml( $page['changefreq'] ) . "</changefreq>\n";
 		echo "\t\t<priority>" . esc_xml( $page['priority'] ) . "</priority>\n";
 		echo "\t</url>\n";
