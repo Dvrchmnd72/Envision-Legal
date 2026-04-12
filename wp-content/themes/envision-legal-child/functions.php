@@ -388,7 +388,7 @@ add_action( 'template_redirect', function () {
  * 301 redirects for legacy unhyphenated slugs → canonical hyphenated versions.
  */
 add_action( 'template_redirect', function () {
-	$request = untrailingslashit( strtok( $_SERVER['REQUEST_URI'] ?? '', '?' ) );
+	$request = untrailingslashit( strtok( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ), '?' ) );
 
 	$redirects = array(
 		'/practiceareas'  => '/practice-areas/',
@@ -1609,8 +1609,8 @@ function el_robots_txt( $output, $public ) {
 	$output .= "Disallow: /wp-login.php\n";
 	$output .= "Disallow: /referrals/intake\n";
 	$output .= "Disallow: /referral-partner-terms\n";
-	$output .= "Disallow: /privacy-policy\n";
-	$output .= "Disallow: /terms-of-use\n";
+	$output .= "Disallow: /privacy-policy/\n";
+	$output .= "Disallow: /terms-of-use/\n";
 	$output .= "Disallow: /?s=\n";
 	$output .= "Disallow: /*?s=\n";
 	$output .= "Disallow: /*?enquiry=\n";
