@@ -1108,3 +1108,517 @@ function el_handle_practice_intake_form() {
 	exit;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// SEO Layer – meta descriptions, Open Graph, JSON-LD schema, sitemap, robots
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Return page-specific SEO data based on template or page type.
+ *
+ * @return array{title:string,description:string,schema:array,breadcrumb:array}
+ */
+function el_get_seo_data() {
+	$site_name = get_bloginfo( 'name' );
+	$home      = home_url( '/' );
+	$phone     = envision_legal_get_phone();
+	$email     = envision_legal_get_email();
+	$logo_url  = esc_url( ENVISION_LEGAL_URI . '/assets/images/logo.png' );
+
+	// Base LocalBusiness schema shared by home + local pages.
+	$local_business_schema = array(
+		'@context'     => 'https://schema.org',
+		'@type'        => array( 'LegalService', 'LocalBusiness' ),
+		'name'         => 'Envision Legal',
+		'url'          => $home,
+		'logo'         => $logo_url,
+		'telephone'    => $phone,
+		'email'        => $email,
+		'address'      => array(
+			'@type'           => 'PostalAddress',
+			'addressLocality' => 'Leppington',
+			'addressRegion'   => 'NSW',
+			'addressCountry'  => 'AU',
+		),
+		'areaServed'   => array(
+			'Campbelltown', 'Liverpool', 'Parramatta', 'Bankstown',
+			'Fairfield', 'Penrith', 'Macarthur', 'Camden', 'Wollondilly', 'Leppington',
+		),
+		'priceRange'   => '$$',
+		'openingHours' => 'Mo-Fr 09:00-17:00',
+		'sameAs'       => array(),
+	);
+
+	// Helper to build a LegalService schema for practice area pages.
+	$practice_schema = function ( $service_type, $description ) use ( $local_business_schema ) {
+		$schema               = $local_business_schema;
+		$schema['@type']      = 'LegalService';
+		$schema['serviceType'] = $service_type;
+		$schema['description'] = $description;
+		return $schema;
+	};
+
+	// Helper to build FAQPage schema.
+	$faq_schema = function ( $faqs ) {
+		$entities = array();
+		foreach ( $faqs as $q => $a ) {
+			$entities[] = array(
+				'@type'          => 'Question',
+				'name'           => $q,
+				'acceptedAnswer' => array(
+					'@type' => 'Answer',
+					'text'  => $a,
+				),
+			);
+		}
+		return array(
+			'@context'   => 'https://schema.org',
+			'@type'      => 'FAQPage',
+			'mainEntity' => $entities,
+		);
+	};
+
+	// Helper to build breadcrumb schema.
+	$breadcrumb_schema = function ( $items ) use ( $home ) {
+		$elements = array();
+		$pos      = 1;
+		foreach ( $items as $name => $url ) {
+			$elements[] = array(
+				'@type'    => 'ListItem',
+				'position' => $pos,
+				'name'     => $name,
+				'item'     => $url ? $url : $home,
+			);
+			$pos++;
+		}
+		return array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $elements,
+		);
+	};
+
+	$template = get_page_template_slug();
+
+	// ── Front Page ──────────────────────────────────────────────────────────
+	if ( is_front_page() ) {
+		return array(
+			'title'       => 'Commercial Lawyers South-West Sydney | Envision Legal',
+			'description' => 'Envision Legal is a boutique commercial law firm in South-West Sydney. Fixed-fee business contracts, startup legals, shareholder agreements and fractional general counsel. Free consultation.',
+			'schema'      => array( $local_business_schema ),
+			'breadcrumb'  => array(),
+		);
+	}
+
+	// ── Business Contracts ──────────────────────────────────────────────────
+	if ( 'page-business-contracts.php' === $template ) {
+		return array(
+			'title'       => 'Business Contract Lawyers Sydney | Envision Legal',
+			'description' => 'Expert business contract lawyers serving Campbelltown, Liverpool and Parramatta. Fixed-fee drafting, review and negotiation of commercial contracts. Get a free call back today.',
+			'schema'      => array(
+				$practice_schema( 'Business Contracts', 'Expert business contract lawyers serving Campbelltown, Liverpool and Parramatta. Fixed-fee drafting, review and negotiation of commercial contracts.' ),
+				$faq_schema( array(
+					'How much does a commercial contract cost?' => 'Simple NDAs and standard service agreements typically start from $500 + GST on a fixed-fee basis. More complex contracts are quoted after a brief consultation. We are transparent about costs before we start.',
+					'Can you review a contract someone else has sent me?' => 'Yes. Contract review is one of our most common services. We read the full document, flag any terms that expose you to risk, and advise on what to push back on before you sign.',
+					'What if the other side uses their own standard terms?' => 'We negotiate on your behalf. We identify the clauses that matter most — liability caps, indemnities, termination rights — and work to get you better terms without blowing up the deal.',
+					'Do you handle ongoing contract management?' => 'Yes — through our Fractional General Counsel service, we can manage your contract library, run renewals and flag risk across your entire agreement portfolio on a retainer basis.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'               => $home,
+				'Practice Areas'     => home_url( '/practiceareas/' ),
+				'Business Contracts' => home_url( '/business-contracts/' ),
+			),
+		);
+	}
+
+	// ── Business Sales & Acquisitions ────────────────────────────────────────
+	if ( 'page-business-sales-acquisitions.php' === $template ) {
+		return array(
+			'title'       => 'Business Sales & Acquisitions Lawyers Sydney | Envision Legal',
+			'description' => 'Buying or selling a business in Sydney? Envision Legal guides buyers and sellers through due diligence, business sale agreements, and settlement. Free call back.',
+			'schema'      => array(
+				$practice_schema( 'Business Sales and Acquisitions', 'Buying or selling a business in Sydney? Envision Legal guides buyers and sellers through due diligence, business sale agreements, and settlement.' ),
+				$faq_schema( array(
+					'How long does a business sale take?' => 'A straightforward asset sale typically completes in 4–8 weeks from execution of the sale agreement. More complex transactions or those involving regulatory approvals can take longer. Early legal involvement reduces delays.',
+					'What is the difference between an asset sale and a share sale?' => 'In an asset sale, the buyer acquires specific business assets. In a share sale, the buyer acquires the company itself including all its history and liabilities. Each has different tax, risk and stamp duty implications.',
+					'Do I need a lawyer if I am using a business broker?' => 'Yes. A broker manages the commercial negotiation and marketing — a lawyer reviews and drafts the legal documents that bind you. The two roles are complementary, not interchangeable.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'                         => $home,
+				'Practice Areas'               => home_url( '/practiceareas/' ),
+				'Business Sales & Acquisitions' => home_url( '/business-sales-acquisitions/' ),
+			),
+		);
+	}
+
+	// ── Shareholder Agreements ───────────────────────────────────────────────
+	if ( 'page-shareholder-agreements.php' === $template ) {
+		return array(
+			'title'       => 'Shareholder Agreement Lawyers Sydney | Envision Legal',
+			'description' => 'Protect your shares and business relationships with a properly drafted shareholders agreement. Serving businesses across South-West Sydney. Fixed-fee, free call back.',
+			'schema'      => array(
+				$practice_schema( 'Shareholder Agreements', 'Protect your shares and business relationships with a properly drafted shareholders agreement. Serving businesses across South-West Sydney.' ),
+				$faq_schema( array(
+					'How much does a shareholders agreement cost?' => 'A straightforward two-shareholder agreement for a small business typically starts from $1,500 + GST. More complex structures with multiple shareholders, vesting schedules or bespoke exit mechanisms are quoted individually.',
+					'Do I need one if I already have a company constitution?' => 'Yes. A constitution is a public document that must comply with the Corporations Act. A shareholders agreement is private, flexible and can address any issue the shareholders agree is important.',
+					'When is the best time to put one in place?' => 'Before you need it. The conversation is straightforward when all shareholders are aligned and optimistic. It becomes significantly harder and more expensive once a dispute has arisen or a shareholder wants to exit.',
+					'Can you review an existing agreement?' => 'Absolutely. We review existing shareholders agreements and partnership agreements, identify gaps or unfair terms, and advise on whether amendments are required.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'                    => $home,
+				'Practice Areas'          => home_url( '/practiceareas/' ),
+				'Shareholder Agreements'  => home_url( '/shareholder-agreements/' ),
+			),
+		);
+	}
+
+	// ── Startup Legals ──────────────────────────────────────────────────────
+	if ( 'page-startup-legals.php' === $template ) {
+		return array(
+			'title'       => 'Startup Lawyers Sydney | Co-Founder Agreements & SAFE Notes | Envision Legal',
+			'description' => 'Legal foundations for startups and founders in Sydney. Co-founder agreements, SAFE notes, ESOPs, IP assignment and seed investment documents. Fixed-fee, free call back.',
+			'schema'      => array(
+				$practice_schema( 'Startup Legal Services', 'Legal foundations for startups and founders in Sydney. Co-founder agreements, SAFE notes, ESOPs, IP assignment and seed investment documents.' ),
+				$faq_schema( array(
+					'When should I get legal advice as a founder?' => 'Before you take on a co-founder, before you bring in your first employee, and before you accept any investment. These are the three moments where a poorly structured deal creates problems that are very expensive to unwind later.',
+					'What is a SAFE note and do I need one?' => 'A SAFE (Simple Agreement for Future Equity) is a short-form investment instrument where an investor puts in money now in exchange for the right to receive equity at a future valuation event. It is faster and cheaper than a priced round and is standard for early-stage Australian startups.',
+					'How does founder vesting work?' => 'Founder vesting means that equity is earned over time rather than granted upfront. A typical structure is a 4-year vest with a 1-year cliff — meaning if a founder leaves in year one, they receive nothing; after that equity vests monthly or quarterly.',
+					'Do you work with pre-revenue startups?' => 'Yes. We offer fixed-fee packages for early-stage founders and can work with you on a staged basis as you grow. We would rather help you get it right early than fix a structural problem during a due diligence process.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'           => $home,
+				'Practice Areas' => home_url( '/practiceareas/' ),
+				'Startup Legals' => home_url( '/startup-legals/' ),
+			),
+		);
+	}
+
+	// ── Intellectual Property ────────────────────────────────────────────────
+	if ( 'page-intellectual-property.php' === $template ) {
+		return array(
+			'title'       => 'Intellectual Property & Trademark Lawyers Sydney | Envision Legal',
+			'description' => 'Trademark registration, IP licensing and copyright advice for businesses in South-West Sydney. Protect your brand before someone else does. Fixed-fee, free call back.',
+			'schema'      => array(
+				$practice_schema( 'Intellectual Property Law', 'Trademark registration, IP licensing and copyright advice for businesses in South-West Sydney. Protect your brand before someone else does.' ),
+				$faq_schema( array(
+					'How much does trademark registration cost?' => 'IP Australia\'s government fees start from around $250 per class for online applications. Our legal fees for a standard single-class application start from $600 + GST. We provide a fixed-fee quote before commencing.',
+					'Do I automatically own the IP my contractor creates?' => 'No — under Australian copyright law, the creator owns copyright unless there is a written agreement transferring ownership. If you have engaged a designer, developer or consultant without a written IP assignment, you may not own what you paid for.',
+					'What is the difference between a trademark and a business name?' => 'Registering a business name with ASIC gives you the right to trade under that name — it does not give you exclusive trademark rights. A registered trademark gives you the legal right to stop others from using a confusingly similar mark.',
+					'How long does trademark registration take?' => 'In Australia, a trademark application typically takes 7–9 months from filing to registration, assuming no objections. We manage the process and keep you updated at each stage.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'                  => $home,
+				'Practice Areas'        => home_url( '/practiceareas/' ),
+				'Intellectual Property'  => home_url( '/intellectual-property/' ),
+			),
+		);
+	}
+
+	// ── Unfair Contract Terms ────────────────────────────────────────────────
+	if ( 'page-unfair-contract-terms.php' === $template ) {
+		return array(
+			'title'       => 'Unfair Contract Terms Lawyers Sydney | ACL Compliance | Envision Legal',
+			'description' => 'Is your business ready for Australia\'s strengthened unfair contract terms regime? Envision Legal audits and redrafts standard-form contracts for ACL compliance. Get a free call back.',
+			'schema'      => array(
+				$practice_schema( 'Unfair Contract Terms', 'Envision Legal audits and redrafts standard-form contracts for ACL compliance with Australia\'s strengthened unfair contract terms regime.' ),
+				$faq_schema( array(
+					'What are the penalties for including unfair terms?' => 'Businesses face civil penalties of up to $50 million for bodies corporate. Individuals face penalties of up to $2.5 million. This is a significant increase from the previous regime where no pecuniary penalties applied.',
+					'Does this apply to B2B contracts?' => 'Yes — the UCT regime applies to standard-form contracts with small businesses up to 100 employees or $10 million turnover. If you use standard-form contracts with any of these counterparties, you need to review them.',
+					'What is a standard-form contract?' => 'A standard-form contract is one prepared by one party and presented to the other on a take-it-or-leave-it basis with little opportunity to negotiate. Courts look at the substance — even a lightly negotiated contract can be treated as standard-form.',
+					'How quickly can you audit our contracts?' => 'For most standard-form contracts we can complete an initial risk assessment within 3–5 business days and provide a written summary of findings and recommended changes.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'                  => $home,
+				'Practice Areas'        => home_url( '/practiceareas/' ),
+				'Unfair Contract Terms'  => home_url( '/unfair-contract-terms/' ),
+			),
+		);
+	}
+
+	// ── Fractional General Counsel ───────────────────────────────────────────
+	if ( 'page-fractional-general-counsel.php' === $template ) {
+		return array(
+			'title'       => 'Fractional General Counsel Sydney | In-House Legal on Retainer | Envision Legal',
+			'description' => 'Senior in-house legal expertise on a flexible retainer from $2,500/month + GST. Envision Legal\'s Fractional General Counsel service for growing businesses in South-West Sydney.',
+			'schema'      => array(
+				$practice_schema( 'Fractional General Counsel', 'Senior in-house legal expertise on a flexible retainer. Envision Legal\'s Fractional General Counsel service for growing businesses in South-West Sydney.' ),
+				$faq_schema( array(
+					'How much does Fractional General Counsel cost?' => 'Most clients start from $2,500 + GST per month on a fixed monthly fee agreed after an initial scoping conversation — no surprise bills.',
+					'What size business is this suited to?' => 'Businesses with 10–200 employees or $2M–$50M annual turnover. If you are spending more than $3,000/month on ad hoc legal fees, a retainer almost certainly makes more financial sense.',
+					'Can I still use other lawyers for specialist matters?' => 'Yes. We coordinate with your existing advisors and refer specialist matters — litigation, property or tax — to trusted specialists, managing those relationships on your behalf.',
+					'Is there a minimum commitment?' => 'We ask for an initial three-month engagement so we can properly embed in your business. After that the arrangement continues on a rolling monthly basis with 30 days notice to end.',
+				) ),
+			),
+			'breadcrumb' => array(
+				'Home'                       => $home,
+				'Fractional General Counsel'  => home_url( '/fractional-general-counsel/' ),
+			),
+		);
+	}
+
+	// ── South-West Sydney Lawyers ────────────────────────────────────────────
+	if ( 'page-south-west-sydney-lawyers.php' === $template ) {
+		return array(
+			'title'       => 'Commercial Lawyers South-West Sydney | Campbelltown, Liverpool & Parramatta',
+			'description' => 'Local commercial law firm serving Campbelltown, Liverpool, Parramatta, Bankstown and surrounding suburbs. Business contracts, startup legals, IP and fractional counsel. Free consultation.',
+			'schema'      => array( $local_business_schema ),
+			'breadcrumb'  => array(),
+		);
+	}
+
+	// ── Referrals ────────────────────────────────────────────────────────────
+	if ( 'page-referrals.php' === $template ) {
+		return array(
+			'title'       => 'Referral Partner Program | Envision Legal',
+			'description' => 'Refer your clients to Envision Legal and earn competitive referral fees. Accountants, finance brokers, business brokers and financial planners welcome. Submit a referral in 2 minutes.',
+			'schema'      => array(
+				array(
+					'@context'    => 'https://schema.org',
+					'@type'       => 'Service',
+					'serviceType' => 'Legal Referral Program',
+					'provider'    => array(
+						'@type' => 'LegalService',
+						'name'  => 'Envision Legal',
+						'url'   => $home,
+					),
+				),
+			),
+			'breadcrumb' => array(),
+		);
+	}
+
+	// ── Contact ──────────────────────────────────────────────────────────────
+	if ( 'page-contact.php' === $template ) {
+		return array(
+			'title'       => 'Contact Envision Legal | Commercial Lawyers South-West Sydney',
+			'description' => 'Get in touch with Envision Legal. Book a free consultation, send us a message, or call us directly. We respond within one business day.',
+			'schema'      => array(
+				array(
+					'@context' => 'https://schema.org',
+					'@type'    => 'ContactPage',
+					'name'     => 'Contact Envision Legal',
+					'url'      => home_url( '/contact/' ),
+				),
+			),
+			'breadcrumb' => array(),
+		);
+	}
+
+	// ── Fallback ─────────────────────────────────────────────────────────────
+	$fallback_title = is_singular()
+		? get_the_title() . ' | ' . $site_name
+		: $site_name;
+	$fallback_desc  = get_bloginfo( 'description' );
+
+	return array(
+		'title'       => $fallback_title,
+		'description' => $fallback_desc,
+		'schema'      => array(),
+		'breadcrumb'  => array(),
+	);
+}
+
+/**
+ * Override <title> via WordPress title-tag support.
+ */
+add_filter( 'pre_get_document_title', 'el_seo_title' );
+function el_seo_title( $title ) {
+	if ( is_admin() ) {
+		return $title;
+	}
+	$seo = el_get_seo_data();
+	return $seo['title'] ? $seo['title'] : $title;
+}
+
+/**
+ * Output meta description, canonical, Open Graph, Twitter Card and JSON-LD.
+ */
+add_action( 'wp_head', 'el_seo_head', 1 );
+function el_seo_head() {
+	$seo       = el_get_seo_data();
+	$title     = $seo['title'];
+	$desc      = $seo['description'];
+	$canonical = is_singular() ? get_permalink() : home_url( '/' );
+
+	if ( is_front_page() ) {
+		$canonical = home_url( '/' );
+	}
+
+	$og_type = is_single() ? 'article' : 'website';
+
+	// ── Meta description ────────────────────────────────────────────────────
+	if ( $desc ) {
+		echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
+	}
+
+	// ── Canonical ───────────────────────────────────────────────────────────
+	echo '<link rel="canonical" href="' . esc_url( $canonical ) . '">' . "\n";
+
+	// ── Open Graph ──────────────────────────────────────────────────────────
+	echo '<meta property="og:type" content="' . esc_attr( $og_type ) . '">' . "\n";
+	echo '<meta property="og:title" content="' . esc_attr( $title ) . '">' . "\n";
+	if ( $desc ) {
+		echo '<meta property="og:description" content="' . esc_attr( $desc ) . '">' . "\n";
+	}
+	echo '<meta property="og:url" content="' . esc_url( $canonical ) . '">' . "\n";
+	echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '">' . "\n";
+	echo '<meta property="og:locale" content="' . esc_attr( get_locale() ) . '">' . "\n";
+
+	// ── Twitter Card ────────────────────────────────────────────────────────
+	echo '<meta name="twitter:card" content="summary">' . "\n";
+	echo '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+	if ( $desc ) {
+		echo '<meta name="twitter:description" content="' . esc_attr( $desc ) . '">' . "\n";
+	}
+
+	// ── JSON-LD Schema ──────────────────────────────────────────────────────
+	if ( ! empty( $seo['schema'] ) ) {
+		foreach ( $seo['schema'] as $block ) {
+			echo '<script type="application/ld+json">' . "\n";
+			echo wp_json_encode( $block, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+			echo "\n</script>\n";
+		}
+	}
+
+	// ── Breadcrumb JSON-LD ──────────────────────────────────────────────────
+	if ( ! empty( $seo['breadcrumb'] ) ) {
+		$bc_items  = array();
+		$position  = 1;
+		foreach ( $seo['breadcrumb'] as $name => $url ) {
+			$bc_items[] = array(
+				'@type'    => 'ListItem',
+				'position' => $position,
+				'name'     => $name,
+				'item'     => $url,
+			);
+			$position++;
+		}
+		$breadcrumb_block = array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $bc_items,
+		);
+		echo '<script type="application/ld+json">' . "\n";
+		echo wp_json_encode( $breadcrumb_block, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+		echo "\n</script>\n";
+	}
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Robots.txt – custom output via WordPress filter
+// ══════════════════════════════════════════════════════════════════════════════
+
+add_filter( 'robots_txt', 'el_robots_txt', 10, 2 );
+/**
+ * Custom robots.txt content.
+ *
+ * @param string $output Default robots.txt output.
+ * @param string $public Site visibility setting (1 = public).
+ * @return string
+ */
+function el_robots_txt( $output, $public ) {
+	if ( '1' !== (string) $public ) {
+		return $output;
+	}
+	$sitemap_url = home_url( '/sitemap.xml' );
+	$output  = "User-agent: *\n";
+	$output .= "Disallow: /wp-admin/\n";
+	$output .= "Allow: /wp-admin/admin-ajax.php\n";
+	$output .= "Disallow: /wp-login.php\n";
+	$output .= "Disallow: /referrals/intake\n";
+	$output .= "Disallow: /referral-partner-terms\n";
+	$output .= "Disallow: /privacypolicy\n";
+	$output .= "Disallow: /termsofuse\n";
+	$output .= "\nSitemap: {$sitemap_url}\n";
+	return $output;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// XML Sitemap – served via rewrite rule at /sitemap.xml
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Register the sitemap rewrite rule.
+ */
+add_action( 'init', 'el_sitemap_rewrite' );
+function el_sitemap_rewrite() {
+	add_rewrite_rule( 'sitemap\.xml$', 'index.php?el_sitemap=1', 'top' );
+}
+
+/**
+ * Register the custom query variable.
+ */
+add_filter( 'query_vars', 'el_sitemap_query_var' );
+function el_sitemap_query_var( $vars ) {
+	$vars[] = 'el_sitemap';
+	return $vars;
+}
+
+/**
+ * Intercept the request and serve XML sitemap if requested.
+ */
+add_action( 'template_redirect', 'el_sitemap_render' );
+function el_sitemap_render() {
+	if ( ! get_query_var( 'el_sitemap' ) ) {
+		return;
+	}
+
+	$home = home_url( '/' );
+
+	// Static pages with priority and change frequency.
+	$static_pages = array(
+		array( 'loc' => $home,                                          'priority' => '1.0',  'changefreq' => 'weekly' ),
+		array( 'loc' => home_url( '/practiceareas/' ),                  'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/business-contracts/' ),             'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/business-sales-acquisitions/' ),    'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/shareholder-agreements/' ),         'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/startup-legals/' ),                 'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/intellectual-property/' ),          'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/unfair-contract-terms/' ),          'priority' => '0.9',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/fractional-general-counsel/' ),     'priority' => '0.95', 'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/south-west-sydney-lawyers/' ),      'priority' => '0.85', 'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/referrals/' ),                      'priority' => '0.7',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/about/' ),                          'priority' => '0.7',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/contact/' ),                        'priority' => '0.8',  'changefreq' => 'monthly' ),
+		array( 'loc' => home_url( '/book/' ),                           'priority' => '0.8',  'changefreq' => 'monthly' ),
+	);
+
+	// Blog posts – latest 50.
+	$posts = get_posts( array(
+		'post_type'      => 'post',
+		'post_status'    => 'publish',
+		'posts_per_page' => 50,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+	) );
+
+	header( 'Content-Type: application/xml; charset=UTF-8' );
+	echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+	foreach ( $static_pages as $page ) {
+		echo "\t<url>\n";
+		echo "\t\t<loc>" . esc_url( $page['loc'] ) . "</loc>\n";
+		echo "\t\t<changefreq>" . esc_xml( $page['changefreq'] ) . "</changefreq>\n";
+		echo "\t\t<priority>" . esc_xml( $page['priority'] ) . "</priority>\n";
+		echo "\t</url>\n";
+	}
+
+	foreach ( $posts as $post ) {
+		echo "\t<url>\n";
+		echo "\t\t<loc>" . esc_url( get_permalink( $post ) ) . "</loc>\n";
+		echo "\t\t<lastmod>" . esc_xml( get_the_modified_date( 'Y-m-d', $post ) ) . "</lastmod>\n";
+		echo "\t\t<changefreq>weekly</changefreq>\n";
+		echo "\t\t<priority>0.6</priority>\n";
+		echo "\t</url>\n";
+	}
+
+	echo '</urlset>' . "\n";
+	exit;
+}
+
