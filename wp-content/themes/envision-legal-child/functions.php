@@ -1605,3 +1605,158 @@ function el_sitemap_render() {
 	exit;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// Analytics & Tracking – GTM, GA4, conversion event dataLayer pushes
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * 1. Customizer: Analytics & Tracking section with GTM and GA4 ID fields.
+ */
+add_action( 'customize_register', 'el_customizer_analytics' );
+function el_customizer_analytics( $wp_customize ) {
+	$wp_customize->add_section(
+		'envision_legal_analytics',
+		array(
+			'title'    => esc_html__( 'Analytics & Tracking', 'envision-legal' ),
+			'priority' => 160,
+		)
+	);
+
+	// GTM Container ID.
+	$wp_customize->add_setting(
+		'envision_gtm_id',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'envision_gtm_id',
+		array(
+			'label'       => esc_html__( 'GTM Container ID', 'envision-legal' ),
+			'description' => esc_html__( 'e.g. GTM-XXXXXXX', 'envision-legal' ),
+			'section'     => 'envision_legal_analytics',
+			'type'        => 'text',
+		)
+	);
+
+	// GA4 Measurement ID.
+	$wp_customize->add_setting(
+		'envision_ga4_id',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'envision_ga4_id',
+		array(
+			'label'       => esc_html__( 'GA4 Measurement ID', 'envision-legal' ),
+			'description' => esc_html__( 'e.g. G-XXXXXXXXXX', 'envision-legal' ),
+			'section'     => 'envision_legal_analytics',
+			'type'        => 'text',
+		)
+	);
+}
+
+/**
+ * 2. dataLayer push on form conversion success pages.
+ *
+ * Fires at wp_head priority 0 — BEFORE GTM loads at priority 1 — so
+ * the event is already queued when GTM processes the initial dataLayer.
+ */
+add_action( 'wp_head', 'el_gtm_datalayer_push', 0 );
+function el_gtm_datalayer_push() {
+	$event     = null;
+	$form_name = null;
+	$page_path = wp_parse_url( home_url( isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/' ), PHP_URL_PATH );
+	$page_path = $page_path ? $page_path : '/';
+
+	// Detect which success state is present.
+	$sent     = isset( $_GET['sent'] )     ? sanitize_key( $_GET['sent'] )     : '';
+	$enquiry  = isset( $_GET['enquiry'] )  ? sanitize_key( $_GET['enquiry'] )  : '';
+	$download = isset( $_GET['download'] ) ? sanitize_key( $_GET['download'] ) : '';
+
+	if ( 'ok' === $sent && is_page( 'contact' ) ) {
+		$event     = 'form_submission';
+		$form_name = 'Contact — Send Us a Message';
+	} elseif ( 'ok' === $download && is_page( 'fractional-general-counsel' ) ) {
+		$event     = 'lead_magnet_download';
+		$form_name = 'Fractional Counsel — Info Pack Download';
+	} elseif ( 'ok' === $enquiry ) {
+		$event = 'form_submission';
+		// Map by current page template slug.
+		$template = get_page_template_slug();
+		$map = array(
+			'page-business-contracts.php'          => 'Business Contracts — Callback',
+			'page-business-sales-acquisitions.php' => 'Business Sales & Acquisitions — Callback',
+			'page-shareholder-agreements.php'      => 'Shareholder Agreements — Callback',
+			'page-startup-legals.php'              => 'Startup Legals — Callback',
+			'page-intellectual-property.php'       => 'Intellectual Property — Callback',
+			'page-unfair-contract-terms.php'       => 'Unfair Contract Terms — Callback',
+			'page-fractional-general-counsel.php'  => 'Fractional General Counsel — Callback',
+		);
+		$form_name = isset( $map[ $template ] ) ? $map[ $template ] : null;
+	}
+
+	if ( ! $event || ! $form_name ) {
+		return; // No conversion on this page load.
+	}
+
+	$data = array(
+		'event'     => $event,
+		'form_name' => $form_name,
+		'page_path' => $page_path,
+	);
+	?>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+	window.dataLayer.push(<?php echo wp_json_encode( $data ); ?>);
+	</script>
+	<?php
+}
+
+/**
+ * 3. GTM <head> snippet (priority 1) with GA4 gtag.js fallback.
+ *
+ * If GTM ID is set → output the GTM container script.
+ * Else if GA4 ID is set → output the direct gtag.js snippet as fallback.
+ */
+add_action( 'wp_head', 'el_gtm_head', 1 );
+function el_gtm_head() {
+	$gtm_id = sanitize_text_field( get_theme_mod( 'envision_gtm_id', '' ) );
+	$ga4_id = sanitize_text_field( get_theme_mod( 'envision_ga4_id', '' ) );
+
+	if ( $gtm_id ) {
+		$gtm_id = esc_attr( $gtm_id );
+		echo "\n<!-- Google Tag Manager -->\n";
+		echo '<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({\'gtm.start\':';
+		echo 'new Date().getTime(),event:\'gtm.js\'});var f=d.getElementsByTagName(s)[0],';
+		echo 'j=d.createElement(s),dl=l!=\'dataLayer\'?\'&l=\'+l:\'\';j.async=true;j.src=';
+		echo '\'https://www.googletagmanager.com/gtm.js?id=\'+i+dl;f.parentNode.insertBefore(j,f);';
+		echo '})(window,document,\'script\',\'dataLayer\',\'' . $gtm_id . '\');</script>';
+		echo "\n<!-- End Google Tag Manager -->\n";
+	} elseif ( $ga4_id ) {
+		$ga4_id = esc_attr( $ga4_id );
+		echo "\n<!-- Google Analytics 4 -->\n";
+		echo '<script async src="https://www.googletagmanager.com/gtag/js?id=' . $ga4_id . '"></script>' . "\n";
+		echo '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag(\'js\',new Date());gtag(\'config\',\'' . $ga4_id . '\');</script>';
+		echo "\n<!-- End Google Analytics 4 -->\n";
+	}
+}
+
+/**
+ * 4. GTM <body> noscript snippet (priority 1).
+ */
+add_action( 'wp_body_open', 'el_gtm_body', 1 );
+function el_gtm_body() {
+	$gtm_id = sanitize_text_field( get_theme_mod( 'envision_gtm_id', '' ) );
+	if ( ! $gtm_id ) {
+		return;
+	}
+	$gtm_id = esc_attr( $gtm_id );
+	echo "\n<!-- Google Tag Manager (noscript) -->\n";
+	echo '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' . $gtm_id . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
+	echo "\n<!-- End Google Tag Manager (noscript) -->\n";
+}
+
