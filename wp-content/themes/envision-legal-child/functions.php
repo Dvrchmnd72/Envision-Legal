@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-define( 'ENVISION_LEGAL_VERSION', '1.1.21' );
+define( 'ENVISION_LEGAL_VERSION', '1.1.22' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
@@ -1890,5 +1890,233 @@ function el_gtm_body() {
 	echo "\n<!-- Google Tag Manager (noscript) -->\n";
 	echo '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' . $gtm_id . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
 	echo "\n<!-- End Google Tag Manager (noscript) -->\n";
+}
+
+// ── Exit-intent / Scroll-depth Popup CTA ─────────────────────────────────────
+
+/**
+ * Inline CSS for the exit-intent popup modal.
+ */
+add_action( 'wp_head', 'el_exit_popup_css', 5 );
+function el_exit_popup_css() {
+	?>
+	<style id="el-exit-popup-css">
+	/* ── Exit-intent popup overlay ─────────────────────────────────────────── */
+	#el-exit-overlay {
+		display: none;
+		position: fixed;
+		inset: 0;
+		background: rgba(10, 20, 50, 0.65);
+		z-index: 9998;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+	#el-exit-overlay.is-visible {
+		display: block;
+		opacity: 1;
+	}
+
+	/* ── Popup card ────────────────────────────────────────────────────────── */
+	#el-exit-popup {
+		display: none;
+		position: fixed;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -44%);
+		width: min(560px, calc(100vw - 2rem));
+		background: #fff;
+		border-radius: 12px;
+		box-shadow: 0 24px 64px rgba(10, 20, 50, 0.22);
+		z-index: 9999;
+		opacity: 0;
+		transition: opacity 0.3s ease, transform 0.3s ease;
+		overflow: hidden;
+	}
+	#el-exit-popup.is-visible {
+		display: block;
+		opacity: 1;
+		transform: translate(-50%, -50%);
+	}
+
+	/* ── Accent bar at top ─────────────────────────────────────────────────── */
+	#el-exit-popup::before {
+		content: '';
+		display: block;
+		height: 4px;
+		background: linear-gradient(90deg, var(--el-navy, #1a2744) 0%, var(--el-gold, #c9a84c) 100%);
+	}
+
+	/* ── Close button ──────────────────────────────────────────────────────── */
+	.el-popup__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: var(--el-text-muted, #6b7280);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.25rem;
+		border-radius: 4px;
+		transition: color 0.2s ease, background 0.2s ease;
+	}
+	.el-popup__close:hover {
+		color: var(--el-navy, #1a2744);
+		background: var(--el-cream, #f8f6f1);
+	}
+
+	/* ── Body ──────────────────────────────────────────────────────────────── */
+	.el-popup__body {
+		padding: 2.5rem 2.5rem 2rem;
+	}
+
+	.el-popup__eyebrow {
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--el-gold, #c9a84c);
+		margin: 0 0 0.75rem;
+	}
+
+	#el-popup-title {
+		font-size: 1.65rem;
+		font-weight: 700;
+		color: var(--el-navy, #1a2744);
+		line-height: 1.25;
+		margin: 0 0 1rem;
+	}
+
+	.el-popup__sub {
+		font-size: 0.95rem;
+		color: var(--el-text-muted, #6b7280);
+		line-height: 1.65;
+		margin: 0 0 1.75rem;
+	}
+
+	/* ── Actions ───────────────────────────────────────────────────────────── */
+	.el-popup__actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 1.5rem;
+	}
+
+	.el-btn--ghost {
+		background: none;
+		border: none;
+		color: var(--el-text-muted, #6b7280);
+		font-size: 0.875rem;
+		font-weight: 500;
+		cursor: pointer;
+		padding: 0.5rem 0;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		transition: color 0.2s ease;
+	}
+	.el-btn--ghost:hover {
+		color: var(--el-navy, #1a2744);
+	}
+
+	/* ── Trust bullets ─────────────────────────────────────────────────────── */
+	.el-popup__trust {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+	}
+	.el-popup__trust li {
+		font-size: 0.8rem;
+		color: var(--el-text-muted, #6b7280);
+	}
+
+	/* ── Mobile ────────────────────────────────────────────────────────────── */
+	@media (max-width: 480px) {
+		.el-popup__body { padding: 2rem 1.5rem 1.5rem; }
+		#el-popup-title { font-size: 1.35rem; }
+		.el-popup__actions { flex-direction: column; align-items: flex-start; }
+	}
+	</style>
+	<?php
+}
+
+/**
+ * Exit-intent / scroll-depth popup CTA.
+ * Rendered in footer on home + practice area pages only.
+ */
+add_action( 'wp_footer', 'el_exit_popup_html', 20 );
+function el_exit_popup_html() {
+	// Only show on home page and practice area pages.
+	$show = false;
+
+	if ( is_front_page() ) {
+		$show = true;
+	}
+
+	$practice_templates = array(
+		'page-business-contracts.php',
+		'page-business-sales-acquisitions.php',
+		'page-shareholder-agreements.php',
+		'page-startup-legals.php',
+		'page-intellectual-property.php',
+		'page-unfair-contract-terms.php',
+		'page-fractional-general-counsel.php',
+		'page-south-west-sydney-lawyers.php',
+		'page-practiceareas.php',
+		'page-about.php',
+	);
+
+	if ( is_page() && in_array( get_page_template_slug(), $practice_templates, true ) ) {
+		$show = true;
+	}
+
+	if ( ! $show ) {
+		return;
+	}
+
+	$book_url = esc_url( home_url( '/book/' ) );
+	?>
+	<div id="el-exit-overlay" aria-hidden="true"></div>
+
+	<div
+		id="el-exit-popup"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="el-popup-title"
+		aria-hidden="true"
+	>
+		<button class="el-popup__close" aria-label="<?php esc_attr_e( 'Close', 'envision-legal' ); ?>">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+				<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+			</svg>
+		</button>
+
+		<div class="el-popup__body">
+			<p class="el-popup__eyebrow"><?php esc_html_e( 'Free Consultation', 'envision-legal' ); ?></p>
+			<h2 id="el-popup-title"><?php esc_html_e( 'Not sure where to start?', 'envision-legal' ); ?></h2>
+			<p class="el-popup__sub"><?php esc_html_e( 'Book a free 30-minute consultation with one of our commercial lawyers. No obligation — just a conversation about your situation.', 'envision-legal' ); ?></p>
+
+			<div class="el-popup__actions">
+				<a href="<?php echo $book_url; ?>" class="el-btn el-btn--primary">
+					<?php esc_html_e( 'Book free consultation →', 'envision-legal' ); ?>
+				</a>
+				<button class="el-popup__dismiss el-btn el-btn--ghost">
+					<?php esc_html_e( 'No thanks', 'envision-legal' ); ?>
+				</button>
+			</div>
+
+			<ul class="el-popup__trust">
+				<li><?php esc_html_e( '✓ Fixed-fee quotes upfront', 'envision-legal' ); ?></li>
+				<li><?php esc_html_e( '✓ Senior lawyer — not a paralegal', 'envision-legal' ); ?></li>
+				<li><?php esc_html_e( '✓ Response within one business day', 'envision-legal' ); ?></li>
+			</ul>
+		</div>
+	</div>
+	<?php
 }
 
