@@ -111,18 +111,33 @@ get_header(); ?>
 			<h2>Matters we handle</h2>
 		</div>
 		<div class="el-rp-matters">
+
+			<?php
+			$linked_matters = array(
+				array( 'emoji' => '💼', 'label' => 'Business Sales &amp; Acquisitions', 'url' => '/business-sales-acquisitions/' ),
+				array( 'emoji' => '📄', 'label' => 'Business Contracts',                 'url' => '/business-contracts/' ),
+				array( 'emoji' => '🏗️', 'label' => 'Business Structuring &amp; Startup Legals', 'url' => '/startup-legals/' ),
+				array( 'emoji' => '🤝', 'label' => 'Shareholder &amp; Partnership Agreements',  'url' => '/shareholder-agreements/' ),
+				array( 'emoji' => '💡', 'label' => 'Intellectual Property &amp; Trademarks',    'url' => '/intellectual-property/' ),
+				array( 'emoji' => '⚖️', 'label' => 'Unfair Contract Terms',                     'url' => '/unfair-contract-terms/' ),
+				array( 'emoji' => '🧑‍💼', 'label' => 'Fractional General Counsel',              'url' => '/fractional-general-counsel/' ),
+			);
+			foreach ( $linked_matters as $matter ) :
+				?>
+				<a href="<?php echo esc_url( home_url( $matter['url'] ) ); ?>" class="el-rp-matter el-rp-matter--linked">
+					<?php echo $matter['emoji']; ?> <?php echo $matter['label']; ?>
+					<span class="el-rp-matter__arrow" aria-hidden="true">→</span>
+				</a>
+			<?php endforeach; ?>
+
 			<div class="el-rp-matter">🏠 Residential Conveyancing</div>
 			<div class="el-rp-matter">🏢 Commercial Property &amp; Leasing</div>
-			<div class="el-rp-matter">💼 Business Sale &amp; Purchase</div>
-			<div class="el-rp-matter">📄 Commercial Contracts</div>
-			<div class="el-rp-matter">🏗️ Business Structuring</div>
-			<div class="el-rp-matter">🤝 Shareholder &amp; Partnership</div>
 			<div class="el-rp-matter">👷 Employment Law</div>
 			<div class="el-rp-matter">📜 Wills &amp; Estate Planning</div>
 			<div class="el-rp-matter">🛡️ Insurance &amp; AFCA Disputes</div>
 			<div class="el-rp-matter">🩺 Personal Injury &amp; CTP</div>
-			<div class="el-rp-matter">📊 Financial Services &amp; Compliance</div>
 			<div class="el-rp-matter">💬 Other — contact us</div>
+
 		</div>
 	</div>
 </section>
@@ -221,6 +236,33 @@ get_header(); ?>
 	font-size: 0.875rem;
 	font-weight: 500;
 	color: var(--el-text);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	text-decoration: none;
+}
+
+a.el-rp-matter--linked {
+	color: var(--el-navy);
+	border-color: var(--el-navy);
+	transition: background var(--el-trans), color var(--el-trans);
+}
+
+a.el-rp-matter--linked:hover {
+	background: var(--el-navy);
+	color: var(--el-white);
+}
+
+a.el-rp-matter--linked:hover .el-rp-matter__arrow {
+	color: var(--el-gold);
+}
+
+.el-rp-matter__arrow {
+	font-size: 0.9rem;
+	color: var(--el-gold);
+	flex-shrink: 0;
+	transition: color var(--el-trans);
 }
 
 /* CTA strip */
