@@ -1,6 +1,6 @@
 /* ==========================================================================
    Envision Legal – Main Theme Stylesheet
-   Compatible with Astra Parent Theme
+   Standalone (no parent theme required)
    ========================================================================== */
 
 /* ── CSS Custom Properties ────────────────────────────────────────────────── */
@@ -50,6 +50,34 @@ body {
 	background: var(--el-white);
 	line-height: 1.7;
 	margin: 0;
+}
+
+/* Normalize list defaults that browsers add */
+ul, ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Normalize button defaults */
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	border: none;
+	background: none;
+	font-family: inherit;
+}
+
+/* Normalize input/select/textarea defaults */
+input,
+select,
+textarea {
+	font-family: inherit;
+	font-size: 1rem;
 }
 
 img {
@@ -997,17 +1025,6 @@ p {
 a.el-header__cta,
 a.el-header__cta:visited,
 a.el-header__cta:link { color: var(--el-white) !important; }
-
-/* ── Hide Astra submenu toggle button (replaced by hover/focus-within + our JS toggle) ── */
-.ast-menu-toggle,
-button.ast-menu-toggle,
-.el-nav__list .ast-menu-toggle,
-.menu-item .ast-menu-toggle,
-button[class*='ast-submenu-toggle'],
-button[class*='ast-dropdown-toggle'],
-button[class*='ast-menu-toggle'] {
-	display: none !important;
-}
 
 /* ── Practice Areas parent link gets subtle chevron via CSS (desktop only) ── */
 .el-nav__list li.menu-item-has-children > a::after {
