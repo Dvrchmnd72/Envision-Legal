@@ -47,7 +47,7 @@ body {
 	font-family: var(--el-font-body);
 	font-size: 1rem;
 	color: var(--el-text);
-	background: var(--el-white);
+	background: var(--el-white, #ffffff);
 	line-height: 1.7;
 	margin: 0;
 }
@@ -175,6 +175,7 @@ p {
 	position: sticky;
 	top: 0;
 	z-index: 100;
+	background: var(--el-white);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -262,8 +263,14 @@ p {
 	stroke: #111827;
 	pointer-events: none;
 }
+.el-nav-toggle {
+	border-color: #111827 !important;
+}
+.el-nav-toggle__icon {
+	stroke: #111827 !important;
+}
 .el-nav-toggle span {
-	background: #111827;
+	background: #111827 !important;
 }
 .el-nav-toggle:hover,
 .el-nav-toggle:focus-visible {

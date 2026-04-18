@@ -17,6 +17,10 @@ define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 // ── Enqueue styles and scripts ────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', 'envision_legal_enqueue_assets' );
 function envision_legal_enqueue_assets() {
+	// Ensure this theme controls the final CSS for this shared handle.
+	wp_dequeue_style( 'envision-legal-theme' );
+	wp_deregister_style( 'envision-legal-theme' );
+
 	// 1. Child theme style overrides
 	wp_enqueue_style(
 		'envision-legal-style',
@@ -192,6 +196,7 @@ function envision_legal_get_address() {
 }
 
 // ── Helper: render site header ─────────────────────────────────────────────────
+if ( ! function_exists( 'envision_legal_header' ) ) :
 function envision_legal_header() {
 	?>
 	<header class="el-header" role="banner">
@@ -234,6 +239,7 @@ function envision_legal_header() {
 	</header>
 	<?php
 }
+endif;
 
 // Fallback menu when no menu is assigned
 function envision_legal_fallback_menu() {
