@@ -1,18 +1,17 @@
 /*
 Theme Name:  Envision Legal
-Description: Astra child theme for Envision Legal – a boutique commercial law firm.
+Description: Custom standalone theme for Envision Legal – a boutique commercial law firm.
 Author:      Dvrchmnd72
 Author URI:  https://github.com/Dvrchmnd72
-Template:    astra
 Version:     1.0.0
 License:     GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: envision-legal
-Tags:        law, legal, astra, child-theme
+Tags:        law, legal
 */
 
 /* =========================================================
-   Envision Legal – base overrides loaded after Astra styles
+   Envision Legal – base styles
    Full custom CSS lives in assets/css/theme.css
    ========================================================= */
 
@@ -70,15 +69,15 @@ Tags:        law, legal, astra, child-theme
 }
 
 /* =========================================================
-   Envision: OSL Booking widget styling (match Astra variables)
+   Envision: OSL Booking widget styling
    ========================================================= */
 
-/* Wrapper variables (use Astra globals so it inherits Envision palette) */
+/* Wrapper variables */
 .osl-bk-wrapper{
-  --el-accent: var(--ast-global-color-0, #111827);
-  --el-accent-2: var(--ast-global-color-1, #2563eb);
-  --el-text: var(--ast-global-color-2, #111827);
-  --el-muted: var(--ast-global-color-3, #6b7280);
+  --el-accent: #111827;
+  --el-accent-2: #2563eb;
+  --el-text: #111827;
+  --el-muted: #6b7280;
   --el-border: rgba(17, 24, 39, 0.12);
   --el-surface: #ffffff;
   --el-surface-2: rgba(17, 24, 39, 0.035);
@@ -138,7 +137,7 @@ Tags:        law, legal, astra, child-theme
   box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
 }
 
-/* Selected state: use Astra accent color (not gold) */
+/* Selected state: use accent color */
 .osl-bk-service-selected,
 .osl-bk-duration-selected{
   border-color: var(--el-accent-2) !important;
@@ -201,10 +200,10 @@ button.osl-bk-next{
 }
 .el-booking-note p{
   margin: .25rem 0;
-  color: var(--ast-global-color-2, #111827);
+  color: #111827;
 }
 .el-booking-note strong{
-  color: var(--ast-global-color-2, #111827);
+  color: #111827;
 }
 
 
@@ -218,10 +217,10 @@ button.osl-bk-next{
 }
 .osl-bk-container .el-booking-note--inside p{
   margin: .25rem 0;
-  color: var(--ast-global-color-2, #111827);
+  color: #111827;
 }
 .osl-bk-container .el-booking-note--inside strong{
-  color: var(--ast-global-color-2, #111827);
+  color: #111827;
 }
 
 
@@ -284,7 +283,6 @@ button.el-accordion__trigger[aria-expanded="false"] {
 }
 
 /* ── Force hamburger toggle visibility on all pages ──────────────────────── */
-/* Uses !important to override Astra parent theme and any other conflicting styles */
 .el-header .el-nav-toggle,
 .el-header .el-nav-toggle[aria-expanded="true"],
 .el-header .el-nav-toggle[aria-expanded="false"],

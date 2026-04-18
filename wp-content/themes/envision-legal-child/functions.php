@@ -14,39 +14,26 @@ define( 'ENVISION_LEGAL_VERSION', '1.1.23' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
-// ── Enqueue parent + child styles and scripts ─────────────────────────────────
+// ── Enqueue styles and scripts ────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', 'envision_legal_enqueue_assets' );
 function envision_legal_enqueue_assets() {
-	// 1. Astra parent stylesheet
+	// 1. Child theme style overrides
 	wp_enqueue_style(
-		'astra-parent-style',
-		get_template_directory_uri() . '/style.css',
+		'envision-legal-style',
+		ENVISION_LEGAL_URI . '/style.css',
 		array(),
 		ENVISION_LEGAL_VERSION
 	);
 
-	// 2. Child theme style overrides
-	wp_enqueue_style(
-		'envision-legal-style',
-		ENVISION_LEGAL_URI . '/style.css',
-		array( 'astra-parent-style' ),
-		ENVISION_LEGAL_VERSION
-	);
-
-	$theme_style_deps = array( 'envision-legal-style' );
-	if ( wp_style_is( 'astra-theme-css', 'registered' ) ) {
-		$theme_style_deps[] = 'astra-theme-css';
-	}
-
-	// 3. Main theme CSS
+	// 2. Main theme CSS
 	wp_enqueue_style(
 		'envision-legal-theme',
 		ENVISION_LEGAL_URI . '/assets/css/theme.css',
-		$theme_style_deps,
+		array( 'envision-legal-style' ),
 		ENVISION_LEGAL_VERSION
 	);
 
-	// 4. Google Fonts – Inter + Playfair Display
+	// 3. Google Fonts – Inter + Playfair Display
 	wp_enqueue_style(
 		'envision-legal-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap',
@@ -54,7 +41,7 @@ function envision_legal_enqueue_assets() {
 		null
 	);
 
-	// 5. Theme JavaScript
+	// 4. Theme JavaScript
 	wp_enqueue_script(
 		'envision-legal-theme',
 		ENVISION_LEGAL_URI . '/assets/js/theme.js',
@@ -342,40 +329,6 @@ function envision_legal_custom_head() {
  */
 
 /**
- * Disable Astra header/footer output (we render our own in header.php/footer.php).
- */
-add_action( 'wp', function () {
-
-	// Header.
-	remove_action( 'astra_header', 'astra_header_markup_open', 5 );
-	remove_action( 'astra_header', 'astra_header_markup_close', 15 );
-	remove_action( 'astra_header', 'astra_header_content', 10 );
-
-	// Footer.
-	remove_action( 'astra_footer', 'astra_footer_markup_open', 5 );
-	remove_action( 'astra_footer', 'astra_footer_markup_close', 15 );
-	remove_action( 'astra_footer', 'astra_footer_content', 10 );
-
-}, 20 );
-
-/**
- * Disable Astra header/footer output (we render our own in header.php/footer.php).
- */
-add_action( 'wp', function () {
-
-	// Header.
-	remove_action( 'astra_header', 'astra_header_markup_open', 5 );
-	remove_action( 'astra_header', 'astra_header_markup_close', 15 );
-	remove_action( 'astra_header', 'astra_header_content', 10 );
-
-	// Footer.
-	remove_action( 'astra_footer', 'astra_footer_markup_open', 5 );
-	remove_action( 'astra_footer', 'astra_footer_markup_close', 15 );
-	remove_action( 'astra_footer', 'astra_footer_content', 10 );
-
-}, 20 );
-
-/**
  * Redirect legacy /blog to the current Posts page (Insights).
  */
 add_action( 'template_redirect', function () {
@@ -410,7 +363,7 @@ add_action( 'template_redirect', function () {
 
 /**
  * Global "Book Consultation" CTA on pages (except Home, Contact, and Book page).
- * Injected into the main page content so it works even if Astra hooks aren't used.
+ * Injected into the main page content via the_content filter.
  */
 add_filter( 'the_content', function ( $content ) {
 
@@ -439,16 +392,6 @@ add_filter( 'the_content', function ( $content ) {
  * Referral Partner Portal — CPT + form handler.
  */
 require_once get_stylesheet_directory() . '/referral-handler.php';
-
-// ── Remove Astra featured image from blog cards ───────────────────────────────
-add_action( 'wp', function() {
-	if ( is_archive() || is_home() || is_search() ) {
-		remove_action( 'astra_entry_top', 'astra_entry_thumbnail_before' );
-		remove_action( 'astra_entry_top', 'astra_entry_thumbnail_after' );
-		add_filter( 'astra_blog_post_featured_image_enabled', '__return_false' );
-		add_filter( 'astra_blog_post_thumbnail', '__return_false' );
-	}
-});
 
 /**
  * Lead magnet: Fractional Counsel PDF download (single opt-in).
