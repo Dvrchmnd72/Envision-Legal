@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-define( 'ENVISION_LEGAL_VERSION', '1.1.24' );
+define( 'ENVISION_LEGAL_VERSION', '2.0.0' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
@@ -59,77 +59,6 @@ function envision_legal_enqueue_assets() {
 			'nonce'   => wp_create_nonce( 'envision_legal_nonce' ),
 		)
 	);
-}
-
-add_action( 'wp_head', 'envision_legal_hamburger_fix', 99 );
-function envision_legal_hamburger_fix() {
-	?>
-	<style id="el-hamburger-fix">
-	/* ── Nuclear hamburger fix: inline to bypass all caching ── */
-
-	/* Base: hidden on desktop */
-	.el-nav-toggle {
-		display: none !important;
-	}
-
-	/* Mobile: force visible */
-	@media (max-width: 768px) {
-		.el-nav-toggle,
-		.el-header .el-nav-toggle,
-		button.el-nav-toggle,
-		.el-header button.el-nav-toggle,
-		.el-header .el-nav-toggle[aria-expanded="true"],
-		.el-header .el-nav-toggle[aria-expanded="false"] {
-			display: flex !important;
-			flex-direction: column !important;
-			justify-content: center !important;
-			align-items: center !important;
-			gap: 5px !important;
-			width: 44px !important;
-			height: 44px !important;
-			background: transparent !important;
-			border: 2px solid #111827 !important;
-			border-radius: 6px !important;
-			cursor: pointer !important;
-			padding: 10px 8px !important;
-			margin-left: auto !important;
-			box-shadow: none !important;
-			outline: none !important;
-			-webkit-appearance: none !important;
-			appearance: none !important;
-			position: relative !important;
-			z-index: 101 !important;
-			opacity: 1 !important;
-			visibility: visible !important;
-			pointer-events: auto !important;
-			min-width: 44px !important;
-			min-height: 44px !important;
-			color: #111827 !important;
-		}
-
-		.el-nav-toggle span,
-		.el-header .el-nav-toggle span,
-		button.el-nav-toggle span,
-		.el-header .el-nav-toggle[aria-expanded="true"] span,
-		.el-header .el-nav-toggle[aria-expanded="false"] span {
-			display: block !important;
-			width: 100% !important;
-			height: 2.5px !important;
-			background: #111827 !important;
-			border-radius: 2px !important;
-			opacity: 1 !important;
-			visibility: visible !important;
-		}
-
-		.el-nav-toggle:hover,
-		.el-nav-toggle:focus-visible,
-		button.el-nav-toggle:hover,
-		button.el-nav-toggle:focus-visible {
-			background: rgba(17, 24, 39, 0.06) !important;
-		}
-	}
-	</style>
-	<?php
 }
 
 // ── Theme Support ─────────────────────────────────────────────────────────────
@@ -278,7 +207,11 @@ function envision_legal_header() {
 			</div>
 
 			<button class="el-nav-toggle" aria-controls="el-primary-nav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'envision-legal' ); ?>">
-				<span></span><span></span><span></span>
+				<svg class="el-nav-toggle__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<line x1="3" y1="6" x2="21" y2="6"/>
+					<line x1="3" y1="12" x2="21" y2="12"/>
+					<line x1="3" y1="18" x2="21" y2="18"/>
+				</svg>
 			</button>
 
 			<nav id="el-primary-nav" class="el-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary', 'envision-legal' ); ?>">
