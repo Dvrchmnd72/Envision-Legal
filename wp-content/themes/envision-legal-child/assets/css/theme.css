@@ -159,7 +159,7 @@ p {
 
 .el-header__logo a,
 .el-header__site-name {
-	color: var(--el-white);
+	color: var(--el-navy);
 	font-family: var(--el-font-heading);
 	font-size: 1.4rem;
 	font-weight: 700;
@@ -230,7 +230,7 @@ p {
 	display: block;
 	width: 100%; /* 100% of the available inner width after horizontal padding */
 	height: 2px;
-	background: var(--el-white);
+	background: var(--el-navy);
 	transition: transform var(--el-trans), opacity var(--el-trans);
 }
 
@@ -300,6 +300,22 @@ p {
 }
 .el-section--navy h2,
 .el-section--navy h3 {
+	color: var(--el-white);
+}
+.el-section--navy p,
+.el-section--navy li,
+.el-section--navy a:not(.el-btn),
+.el-hero a:not(.el-btn),
+.el-page-header a:not(.el-btn),
+.el-cta-banner a:not(.el-btn),
+.el-footer a:not(.el-btn) {
+	color: rgba(255,255,255,0.88);
+}
+.el-section--navy a:not(.el-btn):hover,
+.el-hero a:not(.el-btn):hover,
+.el-page-header a:not(.el-btn):hover,
+.el-cta-banner a:not(.el-btn):hover,
+.el-footer a:not(.el-btn):hover {
 	color: var(--el-white);
 }
 
@@ -775,7 +791,11 @@ p {
 }
 
 @media (max-width: 768px) {
-	.el-nav-toggle { display: flex; }
+	.el-header .el-nav-toggle {
+		display: flex !important;
+		position: relative;
+		z-index: 101;
+	}
 
 	.el-header__cta { display: none; }
 
@@ -852,6 +872,16 @@ p {
 	.el-stats { grid-template-columns: 1fr 1fr; }
 
 	.el-header__inner { position: relative; }
+}
+
+/* Keep dark buttons readable, including 404 and other CTA links */
+a.el-btn--primary,
+a.el-btn--primary:visited,
+a.el-btn--navy,
+a.el-btn--navy:visited,
+a.el-btn--outline,
+a.el-btn--outline:visited {
+	color: var(--el-white) !important;
 }
 
 @media (max-width: 480px) {
