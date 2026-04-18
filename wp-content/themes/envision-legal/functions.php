@@ -192,6 +192,7 @@ function envision_legal_get_address() {
 }
 
 // ── Helper: render site header ─────────────────────────────────────────────────
+if ( ! function_exists( 'envision_legal_header' ) ) :
 function envision_legal_header() {
 	?>
 	<header class="el-header" role="banner">
@@ -230,6 +231,7 @@ function envision_legal_header() {
 	</header>
 	<?php
 }
+endif;
 
 // Fallback menu when no menu is assigned
 function envision_legal_fallback_menu() {
