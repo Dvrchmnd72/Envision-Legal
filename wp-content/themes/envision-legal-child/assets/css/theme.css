@@ -238,37 +238,45 @@ p {
 	background: rgba(255,255,255,0.05);
 }
 
-/* Hamburger toggle – 44×44 touch target */
+/* ── Hamburger toggle (SVG icon) ─────────────────────────────────────────── */
 .el-nav-toggle {
 	display: none;
-	flex-direction: column;
-	justify-content: center;
 	align-items: center;
-	gap: 5px;
+	justify-content: center;
 	width: 44px;
 	height: 44px;
-	background: transparent !important;
-	border: 2px solid #111827 !important;
-	border-radius: 6px !important;
-	cursor: pointer;
-	padding: 10px 8px;
+	padding: 0;
 	margin-left: auto;
-	box-shadow: none !important;
-	outline: none !important;
-	-webkit-appearance: none !important;
-	appearance: none !important;
+	background: none;
+	border: 2px solid #111827;
+	border-radius: 6px;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	flex-shrink: 0;
 }
-.el-nav-toggle span {
+.el-nav-toggle__icon {
 	display: block;
-	width: 100%;
-	height: 2.5px;
-	background: #111827 !important;
-	border-radius: 2px;
-	transition: transform 0.25s ease, opacity 0.25s ease;
+	width: 24px;
+	height: 24px;
+	pointer-events: none;
 }
 .el-nav-toggle:hover,
 .el-nav-toggle:focus-visible {
-	background: rgba(17, 24, 39, 0.06) !important;
+	background: rgba(17, 24, 39, 0.06);
+}
+
+@media (max-width: 768px) {
+	.el-nav-toggle {
+		display: flex;
+		position: relative;
+		z-index: 101;
+	}
+}
+@media (min-width: 769px) {
+	.el-nav-toggle {
+		display: none;
+	}
 }
 
 /* ── Hero Section ─────────────────────────────────────────────────────────── */
@@ -828,13 +836,6 @@ p {
 }
 
 @media (max-width: 768px) {
-	.el-header .el-nav-toggle,
-	button.el-nav-toggle {
-		display: flex !important;
-		position: relative;
-		z-index: 101;
-	}
-
 	.el-header__cta { display: none; }
 
 	.el-container { padding-inline: 1rem; }

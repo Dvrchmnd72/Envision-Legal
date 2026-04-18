@@ -63,11 +63,6 @@ Tags:        law, legal
 /* CTA button doesn't wrap weirdly */
 .el-header__cta{ white-space:nowrap; }
 
-/* Hide mobile toggle on desktop (matches the 768px mobile-nav breakpoint) */
-@media (min-width: 769px){
-  .el-nav-toggle{ display:none !important; }
-}
-
 /* =========================================================
    Envision: OSL Booking widget styling
    ========================================================= */
