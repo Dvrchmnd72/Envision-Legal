@@ -140,7 +140,7 @@ foreach ( $practice_areas as $area ) :
 <!-- ── Why Envision Legal ──────────────────────────────────────────────────── -->
 <section class="el-section el-section--navy" aria-labelledby="why-heading">
 	<div class="el-container">
-		<div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+		<div class="el-home-why-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
 			<div>
 				<p class="el-section__eyebrow"><?php esc_html_e( 'Why Us', 'envision-legal' ); ?></p>
 				<h2 id="why-heading"><?php esc_html_e( 'Legal Expertise That Matches Your Business Ambition', 'envision-legal' ); ?></h2>

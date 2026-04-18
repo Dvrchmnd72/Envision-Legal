@@ -91,7 +91,7 @@ envision_legal_page_open( 'el-page--practice' );
 						<label>Company <input type="text" name="el_company" tabindex="-1" autocomplete="off"></label>
 					</div>
 
-					<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+					<div class="el-fgc-download-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
 						<div class="sha-form-group">
 							<label for="el_name">Full name <span style="font-weight:400;color:#666;">(optional)</span></label>
 							<input id="el_name" name="el_name" type="text" autocomplete="name" placeholder="Jane Smith">

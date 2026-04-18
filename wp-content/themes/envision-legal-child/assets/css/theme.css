@@ -44,6 +44,7 @@
 
 body {
 	font-family: var(--el-font-body);
+	font-size: 1rem;
 	color: var(--el-text);
 	background: var(--el-white);
 	line-height: 1.7;
@@ -96,6 +97,7 @@ p {
 .el-btn {
 	display: inline-block;
 	padding: 0.8rem 2rem;
+	min-height: 44px;
 	border-radius: var(--el-radius);
 	font-family: var(--el-font-body);
 	font-size: 0.95rem;
@@ -194,6 +196,9 @@ p {
 	color: rgba(15,23,42,0.85);
 	font-size: 0.9rem;
 	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 	padding: 0.5rem 0.75rem;
 	border-radius: var(--el-radius);
 	transition: color var(--el-trans), background var(--el-trans);
@@ -208,18 +213,21 @@ p {
 .el-nav-toggle {
 	display: none;
 	flex-direction: column;
-	justify-content: space-between;
-	width: 28px;
-	height: 20px;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+	width: 44px;
+	height: 44px;
 	background: none;
 	border: none;
 	cursor: pointer;
-	padding: 0;
+	padding: 0.5rem;
 	margin-left: auto;
+	border-radius: var(--el-radius);
 }
 .el-nav-toggle span {
 	display: block;
-	width: 100%;
+	width: 24px;
 	height: 2px;
 	background: var(--el-white);
 	transition: transform var(--el-trans), opacity var(--el-trans);
@@ -370,7 +378,7 @@ p {
 .el-card h3 a:hover,
 .el-card__title a:hover { color: var(--el-navy); }
 .el-card p {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--el-text-muted);
     line-height: 1.6;
     margin-bottom: 1rem;
@@ -541,9 +549,37 @@ p {
 
 .el-archive-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 	gap: 2rem;
 	padding: 0;
+}
+
+/* ── Forms ─────────────────────────────────────────────────────────────────── */
+.el-form input[type="text"],
+.el-form input[type="email"],
+.el-form input[type="tel"],
+.el-form input[type="url"],
+.el-form input[type="search"],
+.el-form input[type="number"],
+.el-form input[type="password"],
+.el-form select,
+.el-form textarea,
+.wpcf7-form input[type="text"],
+.wpcf7-form input[type="email"],
+.wpcf7-form input[type="tel"],
+.wpcf7-form select,
+.wpcf7-form textarea {
+	width: 100%;
+	max-width: 100%;
+	min-height: 44px;
+	font-size: 1rem;
+}
+
+.el-form button,
+.el-form input[type="submit"],
+.wpcf7-form input[type="submit"],
+.wpcf7-form button {
+	min-height: 44px;
 }
 
 /* ── Page Header ──────────────────────────────────────────────────────────── */
@@ -721,6 +757,8 @@ p {
 
 	.el-header__cta { display: none; }
 
+	.el-container { padding-inline: 1rem; }
+
 	.el-nav {
 		display: none;
 		position: absolute;
@@ -731,6 +769,8 @@ p {
 		border-top: 1px solid rgba(255,255,255,0.1);
 		padding: 1rem 1.5rem;
 		margin: 0;
+		max-height: calc(100vh - 72px);
+		overflow-y: auto;
 	}
 	.el-nav.is-open { display: block; }
 
@@ -740,7 +780,31 @@ p {
 		gap: 0;
 	}
 	.el-nav__list li { width: 100%; }
-	.el-nav__list li a { display: block; padding: 0.75rem 0; }
+	.el-nav__list li a {
+		display: flex;
+		width: 100%;
+		padding: 0.75rem 0;
+		color: rgba(255,255,255,0.92);
+	}
+	.el-nav__list li a:hover,
+	.el-nav__list li.current-menu-item > a {
+		color: var(--el-white);
+		background: rgba(255,255,255,0.12);
+	}
+
+	.el-submenu-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		min-width: 44px;
+		height: 44px;
+		margin-left: auto;
+		background: transparent;
+		border: 1px solid rgba(255,255,255,0.25);
+		border-radius: var(--el-radius);
+		color: var(--el-white);
+	}
 
 	.el-hero { padding: var(--el-space-md) 0 var(--el-space-lg); }
 
@@ -754,6 +818,22 @@ p {
 @media (max-width: 480px) {
 	.el-stats { grid-template-columns: 1fr; }
 	.el-stat__number { font-size: 2.5rem; }
+	.el-grid,
+	.el-team,
+	.el-archive-grid,
+	.el-home-why-grid,
+	.el-fgc-download-grid,
+	.el-post-nav {
+		grid-template-columns: 1fr !important;
+	}
+	.el-404__code { font-size: 4.5rem; }
+}
+
+@media (max-width: 320px) {
+	.el-container { padding-inline: 0.875rem; }
+	.el-hero__actions .el-btn {
+		width: 100%;
+	}
 }
 
 /* ── Print ────────────────────────────────────────────────────────────────── */
@@ -811,19 +891,22 @@ p {
 @media (max-width: 768px) {
 	.el-nav__list .sub-menu {
 		position: static;
-		display: flex;
+		display: none;
 		flex-direction: column;
 		box-shadow: none;
 		border-top: none;
-		border-left: 2px solid var(--el-navy);
-		margin-left: 1rem;
+		border-left: 2px solid rgba(255,255,255,0.3);
+		margin-left: 0.5rem;
 		padding: 0;
 		background: transparent;
+		min-width: 100%;
 	}
+	.el-nav__list .sub-menu.is-open { display: flex; }
 	.el-nav__list .sub-menu li a {
-		padding: 0.5rem 0.75rem;
-		font-size: 0.85rem;
-		color: rgba(255,255,255,0.75) !important;
+		padding: 0.6rem 0.75rem;
+		font-size: 0.9rem;
+		color: rgba(255,255,255,0.82) !important;
+		min-height: 44px;
 	}
 }
 
@@ -1073,4 +1156,3 @@ form select {
 .el-breadcrumb span[aria-current="page"] {
     color: rgba(255, 255, 255, 0.45);
 }
-
