@@ -792,7 +792,7 @@ p {
 
 @media (max-width: 768px) {
 	.el-header .el-nav-toggle {
-		display: flex !important;
+		display: flex;
 		position: relative;
 		z-index: 101;
 	}
@@ -875,13 +875,15 @@ p {
 }
 
 /* Keep dark buttons readable, including 404 and other CTA links */
-a.el-btn--primary,
-a.el-btn--primary:visited,
-a.el-btn--navy,
-a.el-btn--navy:visited,
-a.el-btn--outline,
-a.el-btn--outline:visited {
-	color: var(--el-white) !important;
+.el-hero a.el-btn--primary,
+.el-hero a.el-btn--outline,
+.el-section--navy a.el-btn--primary,
+.el-section--navy a.el-btn--outline,
+.el-cta-banner a.el-btn--navy,
+.el-404 a.el-btn--primary,
+.el-404 a.el-btn--navy,
+.el-404 a.el-btn--outline {
+	color: var(--el-white);
 }
 
 @media (max-width: 480px) {
