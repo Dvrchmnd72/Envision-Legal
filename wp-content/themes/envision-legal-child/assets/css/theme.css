@@ -220,7 +220,7 @@ p {
 }
 .el-nav-toggle span {
 	display: block;
-	width: 100%; /* 100% of the 28px content area (44 - 8 - 8 padding) */
+	width: 100%; /* 100% of the 28px content area (44 – 8px left – 8px right padding) */
 	height: 2px;
 	background: var(--el-white);
 	transition: transform var(--el-trans), opacity var(--el-trans);
@@ -542,6 +542,7 @@ p {
 
 .el-archive-grid {
 	display: grid;
+	/* min 280px matches el-grid for consistency; original 320px caused overflow on narrow viewports */
 	grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 	gap: 2rem;
 	padding: 0;
@@ -1168,13 +1169,16 @@ form select {
 	grid-template-columns: 1fr 1fr;
 	gap: 1rem;
 }
+/* Next-post link sits in the right column and is right-aligned */
+.el-post-nav__next {
+	text-align: right;
+}
 @media (max-width: 480px) {
 	.el-post-nav {
 		grid-template-columns: 1fr;
 	}
-	.el-post-nav a[style*="text-align:right"],
-	.el-post-nav a[style*="text-align: right"] {
-		margin-left: 0;
+	/* On mobile the right column stacks below, so reset alignment */
+	.el-post-nav__next {
 		text-align: left;
 	}
 }
