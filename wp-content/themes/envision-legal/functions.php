@@ -14,26 +14,18 @@ define( 'ENVISION_LEGAL_VERSION', '1.2.0' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
-// ── Enqueue parent + child styles and scripts ─────────────────────────────────
+// ── Enqueue styles and scripts ────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', 'envision_legal_enqueue_assets' );
 function envision_legal_enqueue_assets() {
-	// 1. Astra parent stylesheet
+	// 1. Theme style overrides
 	wp_enqueue_style(
-		'astra-parent-style',
-		get_template_directory_uri() . '/style.css',
+		'envision-legal-style',
+		ENVISION_LEGAL_URI . '/style.css',
 		array(),
 		ENVISION_LEGAL_VERSION
 	);
 
-	// 2. Child theme style overrides
-	wp_enqueue_style(
-		'envision-legal-style',
-		ENVISION_LEGAL_URI . '/style.css',
-		array( 'astra-parent-style' ),
-		ENVISION_LEGAL_VERSION
-	);
-
-	// 3. Main theme CSS
+	// 2. Main theme CSS
 	wp_enqueue_style(
 		'envision-legal-theme',
 		ENVISION_LEGAL_URI . '/assets/css/theme.css',
@@ -41,7 +33,7 @@ function envision_legal_enqueue_assets() {
 		ENVISION_LEGAL_VERSION
 	);
 
-	// 4. Google Fonts – Inter + Playfair Display
+	// 3. Google Fonts – Inter + Playfair Display
 	wp_enqueue_style(
 		'envision-legal-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap',
@@ -49,7 +41,7 @@ function envision_legal_enqueue_assets() {
 		null
 	);
 
-	// 5. Theme JavaScript
+	// 4. Theme JavaScript
 	wp_enqueue_script(
 		'envision-legal-theme',
 		ENVISION_LEGAL_URI . '/assets/js/theme.js',
@@ -330,8 +322,8 @@ function envision_legal_page_close() {
 add_filter( 'excerpt_length', function() { return 30; } );
 add_filter( 'excerpt_more',   function() { return '&hellip;'; } );
 
-// ── Remove Astra sections that conflict ───────────────────────────────────────
+// ── Optional head hook for theme-level customizations ─────────────────────────
 add_action( 'wp_head', 'envision_legal_custom_head', 20 );
 function envision_legal_custom_head() {
-	// nothing here by default – hook available for child theme overrides
+	// Intentionally empty by default; available as a stable hook point.
 }

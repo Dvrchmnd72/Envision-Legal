@@ -1,6 +1,6 @@
 /* ==========================================================================
    Envision Legal – Main Theme Stylesheet
-   Compatible with Astra Parent Theme
+   Standalone theme stylesheet
    ========================================================================== */
 
 /* ── CSS Custom Properties ────────────────────────────────────────────────── */
@@ -746,4 +746,3 @@ p {
 	.el-header, .el-footer, .el-cta-banner, .el-nav-toggle { display: none; }
 	body { font-size: 12pt; }
 }
-
