@@ -17,23 +17,11 @@ define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 // ── Enqueue styles and scripts ────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', 'envision_legal_enqueue_assets' );
 function envision_legal_enqueue_assets() {
-	// Ensure this theme controls the final CSS for this shared handle.
-	wp_dequeue_style( 'envision-legal-theme' );
-	wp_deregister_style( 'envision-legal-theme' );
-
 	// 1. Child theme style overrides
 	wp_enqueue_style(
 		'envision-legal-style',
 		ENVISION_LEGAL_URI . '/style.css',
 		array(),
-		ENVISION_LEGAL_VERSION
-	);
-
-	// 2. Main theme CSS
-	wp_enqueue_style(
-		'envision-legal-theme',
-		ENVISION_LEGAL_URI . '/assets/css/theme.css',
-		array( 'envision-legal-style' ),
 		ENVISION_LEGAL_VERSION
 	);
 
@@ -62,6 +50,22 @@ function envision_legal_enqueue_assets() {
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( 'envision_legal_nonce' ),
 		)
+	);
+}
+
+// ── Override parent stylesheet – runs after the default priority-10 enqueue ──
+add_action( 'wp_enqueue_scripts', 'envision_legal_child_override_styles', 20 );
+function envision_legal_child_override_styles() {
+	// Ensure the child theme's CSS wins even if a parent theme registered the
+	// same handle at the default priority (10).
+	wp_dequeue_style( 'envision-legal-theme' );
+	wp_deregister_style( 'envision-legal-theme' );
+
+	wp_enqueue_style(
+		'envision-legal-theme',
+		ENVISION_LEGAL_URI . '/assets/css/theme.css',
+		array( 'envision-legal-style' ),
+		ENVISION_LEGAL_VERSION
 	);
 }
 

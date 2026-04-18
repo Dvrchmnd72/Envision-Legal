@@ -244,12 +244,14 @@ p {
 	display: none;
 	align-items: center;
 	justify-content: center;
+	flex-direction: column;
+	gap: 5px;
 	width: 44px;
 	height: 44px;
 	padding: 0;
 	margin-left: auto;
 	background: none;
-	border: 2px solid #111827;
+	border: 2px solid #111827 !important;
 	border-radius: 6px;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -260,17 +262,16 @@ p {
 	display: block;
 	width: 24px;
 	height: 24px;
-	stroke: #111827;
+	stroke: #111827 !important;
 	pointer-events: none;
 }
-.el-nav-toggle {
-	border-color: #111827 !important;
-}
-.el-nav-toggle__icon {
-	stroke: #111827 !important;
-}
+/* Defensive styles for the span-based hamburger variant */
 .el-nav-toggle span {
+	display: block;
+	width: 22px;
+	height: 2px;
 	background: #111827 !important;
+	border-radius: 2px;
 }
 .el-nav-toggle:hover,
 .el-nav-toggle:focus-visible {
