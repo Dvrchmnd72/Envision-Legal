@@ -263,9 +263,6 @@ p {
 	stroke: #111827;
 	pointer-events: none;
 }
-.el-nav-toggle span {
-	background: #111827;
-}
 .el-nav-toggle {
 	border-color: #111827 !important;
 }
