@@ -63,8 +63,8 @@ Tags:        law, legal
 /* CTA button doesn't wrap weirdly */
 .el-header__cta{ white-space:nowrap; }
 
-/* Hide mobile toggle on desktop (adjust breakpoint if needed) */
-@media (min-width: 900px){
+/* Hide mobile toggle on desktop (matches the 768px mobile-nav breakpoint) */
+@media (min-width: 769px){
   .el-nav-toggle{ display:none; }
 }
 
@@ -292,6 +292,8 @@ button.el-nav-toggle[aria-expanded="false"] {
 	background: transparent !important;
 	border: 2px solid var(--el-navy, #111827) !important;
 	border-radius: 6px !important;
+	box-shadow: none !important;
+	outline: none !important;
 }
 
 .el-header .el-nav-toggle span,
@@ -300,4 +302,13 @@ button.el-nav-toggle[aria-expanded="false"] {
 button.el-nav-toggle span {
 	background: var(--el-navy, #111827) !important;
 	height: 2.5px !important;
+}
+
+.el-header .el-nav-toggle:hover,
+.el-header .el-nav-toggle:focus-visible,
+button.el-nav-toggle:hover,
+button.el-nav-toggle:focus-visible {
+	/* Fallback first; color-mix overrides in supporting browsers. */
+	background: rgba(17, 24, 39, 0.06) !important;
+	background: color-mix(in srgb, var(--el-navy, #111827) 6%, transparent) !important;
 }

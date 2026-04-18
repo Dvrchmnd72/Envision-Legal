@@ -318,10 +318,10 @@ function envision_legal_page_close() {
 add_filter( 'excerpt_length', function() { return 30; } );
 add_filter( 'excerpt_more',   function() { return '&hellip;'; } );
 
-// ── Remove Astra sections that conflict ───────────────────────────────────────
+// ── Optional head hook for theme-level customizations ─────────────────────────
 add_action( 'wp_head', 'envision_legal_custom_head', 20 );
 function envision_legal_custom_head() {
-	// nothing here by default – hook available for child theme overrides
+	// Intentionally empty by default; available as a stable hook point.
 }
 
 /**
