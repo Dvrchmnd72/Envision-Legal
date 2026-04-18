@@ -251,7 +251,7 @@ p {
 	padding: 0;
 	margin-left: auto;
 	background: none;
-	border: 2px solid #111827 !important;
+	border: 2px solid #111827;
 	border-radius: 6px;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -262,7 +262,7 @@ p {
 	display: block;
 	width: 24px;
 	height: 24px;
-	stroke: #111827 !important;
+	stroke: #111827;
 	pointer-events: none;
 }
 /* Defensive styles for the span-based hamburger variant */
