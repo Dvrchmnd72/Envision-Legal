@@ -308,6 +308,7 @@ button.el-nav-toggle span {
 .el-header .el-nav-toggle:focus-visible,
 button.el-nav-toggle:hover,
 button.el-nav-toggle:focus-visible {
+	/* Fallback first; color-mix overrides in supporting browsers. */
 	background: rgba(17, 24, 39, 0.06) !important;
 	background: color-mix(in srgb, var(--el-navy, #111827) 6%, transparent) !important;
 }
