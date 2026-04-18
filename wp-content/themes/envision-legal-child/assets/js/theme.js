@@ -9,6 +9,26 @@
   var $toggle = $('.el-nav-toggle');
   var $nav    = $('.el-nav');
 
+  function getMobileNavBreakpoint() {
+    var cssValue = getComputedStyle(document.documentElement)
+      .getPropertyValue('--el-mobile-nav-breakpoint')
+      .trim();
+    var breakpoint = parseInt(cssValue, 10);
+    return Number.isFinite(breakpoint) ? breakpoint : 768;
+  }
+
+  function isMobileNav() {
+    return window.matchMedia('(max-width: ' + getMobileNavBreakpoint() + 'px)').matches;
+  }
+
+  function closeMobileNav() {
+    $toggle.attr('aria-expanded', 'false');
+    $nav.removeClass('is-open');
+    $('.el-nav__list .sub-menu').removeClass('is-open').css('max-height', '');
+    $('.el-nav__list .menu-item-has-children > a').attr('aria-expanded', 'false');
+    $('.el-nav__list .el-submenu-toggle').attr('aria-expanded', 'false').find('span').text('▾');
+  }
+
   $toggle.on('click', function () {
     var expanded = $(this).attr('aria-expanded') === 'true';
     $(this).attr('aria-expanded', String(!expanded));
@@ -17,11 +37,7 @@
 
   $(document).on('click', function (e) {
     if (!$(e.target).closest('.el-header').length) {
-      $toggle.attr('aria-expanded', 'false');
-      $nav.removeClass('is-open');
-      // Close all open sub-menus
-      $('.el-nav__list .sub-menu').removeClass('is-open').css('max-height', '');
-      $('.el-nav__list .menu-item-has-children > a').attr('aria-expanded', 'false');
+      closeMobileNav();
     }
   });
 
@@ -35,6 +51,7 @@
 
       var $btn = $('<button>', {
         'class':       'el-submenu-toggle',
+        'type':        'button',
         'aria-expanded': 'false',
         'aria-label':  'Toggle sub-menu',
         html:          '<span>▾</span>',
@@ -44,6 +61,7 @@
 
       $btn.on('click', function (e) {
         e.stopPropagation();
+        if (!isMobileNav()) return;
         var $subMenu  = $item.children('.sub-menu');
         var isOpen    = $btn.attr('aria-expanded') === 'true';
 
@@ -63,6 +81,22 @@
       });
     });
   }
+
+  var resizeTimer;
+  $(window).on('resize.elNav', function () {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(function () {
+      if (!isMobileNav()) {
+        closeMobileNav();
+      }
+    }, 150);
+  });
+
+  $(document).on('click', '.el-nav__list a', function () {
+    if (!isMobileNav()) return;
+    if ($(this).siblings('.sub-menu').length) return;
+    closeMobileNav();
+  });
 
   /* ── Accordion helpers ──────────────────────────────────────────────────── */
   function openAccordionItem($item) {
