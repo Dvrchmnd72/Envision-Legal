@@ -228,7 +228,7 @@ p {
 }
 .el-nav-toggle span {
 	display: block;
-	width: 100%; /* 100% of the 28px content area (44 – 8px left – 8px right padding) */
+	width: 100%; /* 100% of the available inner width after horizontal padding */
 	height: 2px;
 	background: var(--el-white);
 	transition: transform var(--el-trans), opacity var(--el-trans);
@@ -946,9 +946,8 @@ p {
 		background: transparent;
 		min-width: 100%;
 	}
-	/* Disable the CSS-only hover/focus-within trigger on mobile; JS toggle handles this */
-	.el-nav__list li:hover > .sub-menu,
-	.el-nav__list li:focus-within > .sub-menu {
+	/* Disable hover-open trigger on mobile; JS toggle handles open/close state */
+	.el-nav__list li:hover > .sub-menu {
 		max-height: 0;
 	}
 	.el-nav__list .sub-menu li a {
