@@ -52,8 +52,10 @@ body {
 	margin: 0;
 }
 
-/* Normalize list defaults that browsers add */
-ul, ol {
+/* Reset list styles only for navigation / layout lists */
+nav ul, nav ol,
+.el-nav__list,
+.el-footer__list {
 	margin: 0;
 	padding: 0;
 	list-style: none;

@@ -17,7 +17,7 @@ define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 // ── Enqueue styles and scripts ────────────────────────────────────────────────
 add_action( 'wp_enqueue_scripts', 'envision_legal_enqueue_assets' );
 function envision_legal_enqueue_assets() {
-	// 1. Child theme style overrides
+	// 1. Base theme styles
 	wp_enqueue_style(
 		'envision-legal-style',
 		ENVISION_LEGAL_URI . '/style.css',
@@ -53,11 +53,10 @@ function envision_legal_enqueue_assets() {
 	);
 }
 
-// ── Override parent stylesheet – runs after the default priority-10 enqueue ──
+// ── Re-register theme.css with the correct dependency ─────────────────────────
 add_action( 'wp_enqueue_scripts', 'envision_legal_child_override_styles', 20 );
 function envision_legal_child_override_styles() {
-	// Ensure the child theme's CSS wins even if a parent theme registered the
-	// same handle at the default priority (10).
+	// Ensure theme.css is loaded with the intended dependency order.
 	wp_dequeue_style( 'envision-legal-theme' );
 	wp_deregister_style( 'envision-legal-theme' );
 
@@ -337,10 +336,6 @@ add_action( 'wp_head', 'envision_legal_custom_head', 20 );
 function envision_legal_custom_head() {
 	// Intentionally empty by default; available as a stable hook point.
 }
-
-/**
- * Force-disable GoDaddy Launch "Coming Soon" page so the site renders normally.
- */
 
 /**
  * Redirect legacy /blog to the current Posts page (Insights).
