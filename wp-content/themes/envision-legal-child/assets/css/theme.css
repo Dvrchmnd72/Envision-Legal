@@ -275,6 +275,41 @@ p {
 	background: #111827 !important;
 	border-radius: 2px;
 }
+
+/* Force hamburger always visible with dark lines on white header */
+.el-header .el-nav-toggle {
+	border-color: #111827 !important;
+	background: transparent !important;
+}
+
+.el-header .el-nav-toggle .el-nav-toggle__icon {
+	stroke: #111827 !important;
+	display: block !important;
+}
+
+.el-header .el-nav-toggle span {
+	background: #111827 !important;
+}
+
+/* Override any parent-theme white color on spans */
+button.el-nav-toggle span {
+	background: #111827 !important;
+}
+
+/* Maximum-specificity header override for consistent visibility on all pages */
+.el-header .el-header__inner button.el-nav-toggle {
+	border-color: #111827 !important;
+	background: transparent !important;
+}
+
+.el-header .el-header__inner button.el-nav-toggle .el-nav-toggle__icon {
+	stroke: #111827 !important;
+	display: block !important;
+}
+
+.el-header .el-header__inner button.el-nav-toggle span {
+	background: #111827 !important;
+}
 .el-nav-toggle:hover,
 .el-nav-toggle:focus-visible {
 	background: rgba(17, 24, 39, 0.06);
