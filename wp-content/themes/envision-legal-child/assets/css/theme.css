@@ -219,7 +219,7 @@ p {
 	gap: 5px;
 	width: 44px;
 	height: 44px;
-	background: none;
+	background: var(--el-navy);
 	border: none;
 	cursor: pointer;
 	padding: 12px 8px;
@@ -230,7 +230,7 @@ p {
 	display: block;
 	width: 100%; /* 100% of the available inner width after horizontal padding */
 	height: 2px;
-	background: var(--el-navy);
+	background: var(--el-white);
 	transition: transform var(--el-trans), opacity var(--el-trans);
 }
 
