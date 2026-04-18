@@ -273,6 +273,7 @@ button.el-accordion__trigger[aria-expanded="true"],
 button.el-accordion__trigger[aria-expanded="false"] {
 	color: var(--el-navy) !important;
 }
+
 button.el-accordion__trigger,
 button.el-accordion__trigger:hover,
 button.el-accordion__trigger:focus,
@@ -280,4 +281,25 @@ button.el-accordion__trigger:active,
 button.el-accordion__trigger[aria-expanded="true"],
 button.el-accordion__trigger[aria-expanded="false"] {
 	color: var(--el-navy) !important;
+}
+
+/* ── Force hamburger toggle visibility on all pages ──────────────────────── */
+/* Uses !important to override Astra parent theme and any other conflicting styles */
+.el-header .el-nav-toggle,
+.el-header .el-nav-toggle[aria-expanded="true"],
+.el-header .el-nav-toggle[aria-expanded="false"],
+button.el-nav-toggle,
+button.el-nav-toggle[aria-expanded="true"],
+button.el-nav-toggle[aria-expanded="false"] {
+	background: transparent !important;
+	border: 2px solid var(--el-navy, #111827) !important;
+	border-radius: 6px !important;
+}
+
+.el-header .el-nav-toggle span,
+.el-header .el-nav-toggle[aria-expanded="true"] span,
+.el-header .el-nav-toggle[aria-expanded="false"] span,
+button.el-nav-toggle span {
+	background: var(--el-navy, #111827) !important;
+	height: 2.5px !important;
 }
