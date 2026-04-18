@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-define( 'ENVISION_LEGAL_VERSION', '1.1.22' );
+define( 'ENVISION_LEGAL_VERSION', '1.1.23' );
 define( 'ENVISION_LEGAL_DIR', get_stylesheet_directory() );
 define( 'ENVISION_LEGAL_URI', get_stylesheet_directory_uri() );
 
@@ -33,11 +33,16 @@ function envision_legal_enqueue_assets() {
 		ENVISION_LEGAL_VERSION
 	);
 
+	$theme_style_deps = array( 'envision-legal-style' );
+	if ( wp_style_is( 'astra-theme-css', 'registered' ) ) {
+		$theme_style_deps[] = 'astra-theme-css';
+	}
+
 	// 3. Main theme CSS
 	wp_enqueue_style(
 		'envision-legal-theme',
 		ENVISION_LEGAL_URI . '/assets/css/theme.css',
-		array( 'envision-legal-style', 'astra-theme-css' ),
+		$theme_style_deps,
 		ENVISION_LEGAL_VERSION
 	);
 
@@ -2119,4 +2124,3 @@ function el_exit_popup_html() {
 	</div>
 	<?php
 }
-
