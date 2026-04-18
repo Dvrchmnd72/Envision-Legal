@@ -94,13 +94,13 @@ while ( have_posts() ) :
 			<?php endif; ?>
 
 			<!-- Post navigation -->
-			<nav class="el-post-nav" aria-label="<?php esc_attr_e( 'Post navigation', 'envision-legal' ); ?>" style="margin-top:3rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+			<nav class="el-post-nav" aria-label="<?php esc_attr_e( 'Post navigation', 'envision-legal' ); ?>">
 				<?php
 				$prev = get_previous_post();
 				$next = get_next_post();
 				if ( $prev ) :
 					?>
-					<a href="<?php echo esc_url( get_permalink( $prev ) ); ?>" class="el-btn el-btn--outline" style="text-align:left">
+					<a href="<?php echo esc_url( get_permalink( $prev ) ); ?>" class="el-btn el-btn--outline">
 						&larr; <?php echo esc_html( get_the_title( $prev ) ); ?>
 					</a>
 					<?php
@@ -109,7 +109,7 @@ while ( have_posts() ) :
 				endif;
 				if ( $next ) :
 					?>
-					<a href="<?php echo esc_url( get_permalink( $next ) ); ?>" class="el-btn el-btn--outline" style="text-align:right;margin-left:auto">
+					<a href="<?php echo esc_url( get_permalink( $next ) ); ?>" class="el-btn el-btn--outline el-post-nav__next">
 						<?php echo esc_html( get_the_title( $next ) ); ?> &rarr;
 					</a>
 					<?php
