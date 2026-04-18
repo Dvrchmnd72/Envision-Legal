@@ -94,7 +94,7 @@ while ( have_posts() ) :
 			<?php endif; ?>
 
 			<!-- Post navigation -->
-			<nav class="el-post-nav" aria-label="<?php esc_attr_e( 'Post navigation', 'envision-legal' ); ?>" style="margin-top:3rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+			<nav class="el-post-nav" aria-label="<?php esc_attr_e( 'Post navigation', 'envision-legal' ); ?>">
 				<?php
 				$prev = get_previous_post();
 				$next = get_next_post();

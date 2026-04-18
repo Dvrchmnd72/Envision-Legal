@@ -204,22 +204,23 @@ p {
 	background: rgba(255,255,255,0.05);
 }
 
-/* Hamburger toggle */
+/* Hamburger toggle – 44×44 touch target, 28×20 visual bars */
 .el-nav-toggle {
 	display: none;
 	flex-direction: column;
-	justify-content: space-between;
-	width: 28px;
-	height: 20px;
+	justify-content: center;
+	gap: 5px;
+	width: 44px;
+	height: 44px;
 	background: none;
 	border: none;
 	cursor: pointer;
-	padding: 0;
+	padding: 12px 8px;
 	margin-left: auto;
 }
 .el-nav-toggle span {
 	display: block;
-	width: 100%;
+	width: 100%; /* 100% of the 28px content area (44 - 8 - 8 padding) */
 	height: 2px;
 	background: var(--el-white);
 	transition: transform var(--el-trans), opacity var(--el-trans);
@@ -300,7 +301,7 @@ p {
 }
 
 .el-section__eyebrow {
-	font-size: 0.8rem;
+	font-size: 0.85rem;
 	font-weight: 700;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -311,7 +312,7 @@ p {
 /* ── Cards ────────────────────────────────────────────────────────────────── */
 .el-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 	gap: 2rem;
 }
 
@@ -342,7 +343,7 @@ p {
     flex-wrap: wrap;
 }
 .el-card__cat-pill {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.07em;
     color: var(--el-navy);
@@ -541,7 +542,7 @@ p {
 
 .el-archive-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 	gap: 2rem;
 	padding: 0;
 }
@@ -556,7 +557,7 @@ p {
 .el-page-header p { color: rgba(255,255,255,0.8); max-width: 600px; margin-top: 0.75rem; }
 
 /* ── Team / About ─────────────────────────────────────────────────────────── */
-.el-team { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+.el-team { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 2rem; }
 
 .el-team-card {
 	text-align: center;
@@ -671,8 +672,8 @@ p {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 40px;
-	height: 40px;
+	min-width: 44px;
+	height: 44px;
 	padding: 0 0.75rem;
 	border: 1px solid var(--el-border);
 	border-radius: var(--el-radius);
@@ -740,7 +741,47 @@ p {
 		gap: 0;
 	}
 	.el-nav__list li { width: 100%; }
-	.el-nav__list li a { display: block; padding: 0.75rem 0; }
+
+	/* Nav links must be white on the dark mobile menu background */
+	.el-nav__list li a {
+		display: block;
+		padding: 0.75rem 0;
+		color: rgba(255,255,255,0.9);
+		min-height: 44px;
+		line-height: 1.5;
+	}
+	.el-nav__list li a:hover,
+	.el-nav__list li.current-menu-item > a {
+		color: var(--el-white);
+		background: rgba(255,255,255,0.05);
+	}
+
+	/* Parent items: put the toggle arrow inline with the link */
+	.el-nav__list .menu-item-has-children {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	.el-nav__list .menu-item-has-children > a {
+		flex: 1;
+		min-width: 0;
+	}
+
+	/* JS-injected mobile sub-menu toggle button */
+	.el-submenu-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 44px;
+		min-height: 44px;
+		background: none;
+		border: none;
+		color: rgba(255,255,255,0.85);
+		font-size: 1.1rem;
+		cursor: pointer;
+		padding: 0;
+		flex-shrink: 0;
+	}
 
 	.el-hero { padding: var(--el-space-md) 0 var(--el-space-lg); }
 
@@ -811,14 +852,25 @@ p {
 @media (max-width: 768px) {
 	.el-nav__list .sub-menu {
 		position: static;
+		/* Sub-menus are hidden by default; JS toggles max-height to animate open */
 		display: flex;
 		flex-direction: column;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease;
+		/* Take full width so sub-items align with parent */
+		flex-basis: 100%;
 		box-shadow: none;
 		border-top: none;
-		border-left: 2px solid var(--el-navy);
+		border-left: 2px solid rgba(255,255,255,0.2);
 		margin-left: 1rem;
 		padding: 0;
 		background: transparent;
+	}
+	/* Disable the CSS-only hover/focus-within trigger on mobile; JS toggle handles this */
+	.el-nav__list li:hover > .sub-menu,
+	.el-nav__list li:focus-within > .sub-menu {
+		max-height: 0;
 	}
 	.el-nav__list .sub-menu li a {
 		padding: 0.5rem 0.75rem;
@@ -835,22 +887,29 @@ a.el-header__cta,
 a.el-header__cta:visited,
 a.el-header__cta:link { color: var(--el-white) !important; }
 
-/* ── Hide Astra submenu toggle button (replaced by hover/focus-within) ── */
+/* ── Hide Astra submenu toggle button (replaced by hover/focus-within + our JS toggle) ── */
 .ast-menu-toggle,
 button.ast-menu-toggle,
 .el-nav__list .ast-menu-toggle,
 .menu-item .ast-menu-toggle,
-button[class*='submenu-toggle'],
-button[class*='dropdown-toggle'] {
+button[class*='ast-submenu-toggle'],
+button[class*='ast-dropdown-toggle'],
+button[class*='ast-menu-toggle'] {
 	display: none !important;
 }
 
-/* ── Practice Areas parent link gets subtle chevron via CSS ── */
+/* ── Practice Areas parent link gets subtle chevron via CSS (desktop only) ── */
 .el-nav__list li.menu-item-has-children > a::after {
 	content: ' \25BE';
 	font-size: 0.7em;
 	margin-left: 0.3em;
 	opacity: 0.7;
+}
+/* On mobile the JS toggle button provides the arrow; suppress the CSS one */
+@media (max-width: 768px) {
+	.el-nav__list li.menu-item-has-children > a::after {
+		content: none;
+	}
 }
 
 /* ── Home hero buttons: visible by default ─────────────────────────────── */
@@ -1074,3 +1133,48 @@ form select {
     color: rgba(255, 255, 255, 0.45);
 }
 
+/* ── Responsive 2-column layouts (moved from inline styles) ──────────────── */
+
+/* "Why Envision Legal" two-column on home page */
+.el-why-inner {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 4rem;
+	align-items: center;
+}
+@media (max-width: 768px) {
+	.el-why-inner {
+		grid-template-columns: 1fr;
+		gap: 2rem;
+	}
+}
+
+/* Two-column form row (e.g. name + email side-by-side on FGC download form) */
+.el-form-two-col {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+@media (max-width: 600px) {
+	.el-form-two-col {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Post navigation (previous / next) */
+.el-post-nav {
+	margin-top: 3rem;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+@media (max-width: 480px) {
+	.el-post-nav {
+		grid-template-columns: 1fr;
+	}
+	.el-post-nav a[style*="text-align:right"],
+	.el-post-nav a[style*="text-align: right"] {
+		margin-left: 0;
+		text-align: left;
+	}
+}
