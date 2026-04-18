@@ -253,8 +253,7 @@ p {
 	padding: 0;
 	margin-left: auto;
 	background: none;
-	border: 2px solid #111827;
-	border-radius: 6px;
+	border: none;
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: none;
@@ -278,7 +277,7 @@ p {
 
 /* Force hamburger always visible with dark lines on white header */
 .el-header .el-nav-toggle {
-	border-color: #111827 !important;
+	border: none !important;
 	background: transparent;
 }
 
@@ -296,7 +295,6 @@ p {
 }
 .el-nav-toggle:focus,
 .el-nav-toggle:active {
-	border-color: #111827;
 	outline: 2px solid #2563eb;
 	outline-offset: 2px;
 }
