@@ -29,6 +29,7 @@
 
 	/* Layout */
 	--el-max-width: 1200px;
+	--el-mobile-nav-breakpoint: 768;
 	--el-radius:    4px;
 
 	/* Transitions */
@@ -554,6 +555,26 @@ p {
 	padding: 0;
 }
 
+.el-home-why-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 4rem;
+	align-items: center;
+}
+
+.el-fgc-download-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+
+.el-post-nav {
+	margin-top: 3rem;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+
 /* ── Forms ─────────────────────────────────────────────────────────────────── */
 .el-form input[type="text"],
 .el-form input[type="email"],
@@ -824,7 +845,7 @@ p {
 	.el-home-why-grid,
 	.el-fgc-download-grid,
 	.el-post-nav {
-		grid-template-columns: 1fr !important;
+		grid-template-columns: 1fr;
 	}
 	.el-404__code { font-size: 4.5rem; }
 }

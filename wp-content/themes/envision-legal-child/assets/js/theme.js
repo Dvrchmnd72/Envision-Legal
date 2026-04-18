@@ -8,10 +8,17 @@
   /* ── Mobile Navigation ──────────────────────────────────────────────────── */
   var $toggle = $('.el-nav-toggle');
   var $nav    = $('.el-nav');
-  var mobileNavBreakpoint = '(max-width: 768px)';
+
+  function getMobileNavBreakpoint() {
+    var cssValue = getComputedStyle(document.documentElement)
+      .getPropertyValue('--el-mobile-nav-breakpoint')
+      .trim();
+    var breakpoint = parseInt(cssValue, 10);
+    return Number.isFinite(breakpoint) ? breakpoint : 768;
+  }
 
   function isMobileNav() {
-    return window.matchMedia(mobileNavBreakpoint).matches;
+    return window.matchMedia('(max-width: ' + getMobileNavBreakpoint() + 'px)').matches;
   }
 
   function closeMobileNav() {
@@ -75,10 +82,14 @@
     });
   }
 
+  var resizeTimer;
   $(window).on('resize.elNav', function () {
-    if (!isMobileNav()) {
-      closeMobileNav();
-    }
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(function () {
+      if (!isMobileNav()) {
+        closeMobileNav();
+      }
+    }, 150);
   });
 
   $(document).on('click', '.el-nav__list a', function () {
