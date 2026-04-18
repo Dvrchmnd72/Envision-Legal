@@ -175,6 +175,7 @@ p {
 	position: sticky;
 	top: 0;
 	z-index: 100;
+	background: var(--el-white);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -264,6 +265,15 @@ p {
 }
 .el-nav-toggle span {
 	background: #111827;
+}
+.el-nav-toggle {
+	border-color: #111827 !important;
+}
+.el-nav-toggle__icon {
+	stroke: #111827 !important;
+}
+.el-nav-toggle span {
+	background: #111827 !important;
 }
 .el-nav-toggle:hover,
 .el-nav-toggle:focus-visible {
