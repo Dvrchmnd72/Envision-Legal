@@ -252,8 +252,11 @@ p {
 	height: 44px;
 	padding: 0;
 	margin-left: auto;
-	background: none;
+	background: transparent;
 	border: none;
+	box-shadow: none;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: none;
@@ -279,6 +282,8 @@ p {
 .el-header .el-nav-toggle {
 	border: none !important;
 	background: transparent;
+	box-shadow: none !important;
+	-webkit-tap-highlight-color: transparent;
 }
 
 .el-header .el-nav-toggle .el-nav-toggle__icon {
